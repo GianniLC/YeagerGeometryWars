@@ -1,22 +1,26 @@
 package SjoerdGianni.org;
 
 import com.github.hanyaeger.api.YaegerGame;
+import com.github.hanyaeger.api.Size;
+import SjoerdGianni.org.scenes.TitleScene;
+import SjoerdGianni.org.scenes.GameScene;
+import SjoerdGianni.org.scenes.EndScene;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main extends YaegerGame {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         launch(args);
     }
 
-
-    @java.lang.Override
+    @Override
     public void setupGame() {
-
+        setGameTitle("Geometry Wars Clone");
+        setSize(new Size(1280, 720));
     }
 
-    @java.lang.Override
+    @Override
     public void setupScenes() {
-
+        addScene(0, new TitleScene(this));
+        addScene(1, new GameScene(this));
+        addScene(2, new EndScene(this));
     }
 }
