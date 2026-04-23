@@ -15,7 +15,7 @@ import SjoerdGianni.org.entities.LabelBox;
 import java.util.Set;
 
 public class TitleScene extends StaticScene implements KeyListener {
-    private YaegerGame yaegerGame;
+    private final YaegerGame yaegerGame;
 
     public TitleScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;

@@ -15,7 +15,7 @@ import SjoerdGianni.org.entities.*;
 import java.util.Set;
 
 public class GameScene extends DynamicScene implements KeyListener {
-    private YaegerGame yaegerGame;
+    private final YaegerGame yaegerGame;
 
     public GameScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
