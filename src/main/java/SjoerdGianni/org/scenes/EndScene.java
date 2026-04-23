@@ -2,6 +2,7 @@ package SjoerdGianni.org.scenes;
 
 import com.github.hanyaeger.api.YaegerGame;
 import com.github.hanyaeger.api.scenes.StaticScene;
+import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.userinput.KeyListener;
 import javafx.scene.input.KeyCode;
@@ -9,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import com.github.hanyaeger.api.Coordinate2D;
+import SjoerdGianni.org.entities.LabelBox;
 
 import java.util.Set;
 
@@ -27,11 +29,11 @@ public class EndScene extends StaticScene implements KeyListener {
     @Override
     public void setupEntities() {
         // Scene label box
-        var sceneBox = new SjoerdGianni.org.entities.LabelBox(new Coordinate2D(10, 10), 200, 40);
+        var sceneBox = new LabelBox(new Coordinate2D(10, 10), 200, 40);
         addEntity(sceneBox);
         
         var sceneLabel = new TextEntity(new Coordinate2D(110, 30), "END SCENE");
-        sceneLabel.setAnchorPoint(com.github.hanyaeger.api.AnchorPoint.CENTER_CENTER);
+        sceneLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         sceneLabel.setFill(Color.BLACK);
         sceneLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         addEntity(sceneLabel);
@@ -40,7 +42,7 @@ public class EndScene extends StaticScene implements KeyListener {
             new Coordinate2D(640, 300),
             "GAME OVER"
         );
-        gameOverText.setAnchorPoint(com.github.hanyaeger.api.AnchorPoint.CENTER_CENTER);
+        gameOverText.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         gameOverText.setFill(Color.RED);
         gameOverText.setFont(Font.font("Arial", FontWeight.BOLD, 60));
         addEntity(gameOverText);
@@ -49,7 +51,7 @@ public class EndScene extends StaticScene implements KeyListener {
             new Coordinate2D(640, 400),
             "Press E to return to title"
         );
-        instructionText.setAnchorPoint(com.github.hanyaeger.api.AnchorPoint.CENTER_CENTER);
+        instructionText.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         instructionText.setFill(Color.LIGHTGRAY);
         instructionText.setFont(Font.font("Arial", FontWeight.NORMAL, 30));
         addEntity(instructionText);
