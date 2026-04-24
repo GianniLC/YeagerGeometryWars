@@ -12,7 +12,7 @@ public class Bullet extends DynamicCircleEntity implements Collider, SceneBorder
 
     private YaegerEntity targetEntity; // Needs to be worked out better: goal is to make bullet only hit specific targets (e.g. Player or Enemy)
 
-    public Bullet(Coordinate2D location, Coordinate2D target, YaegerEntity targetEntity) {
+    public Bullet(Coordinate2D location, Coordinate2D target) {
         super(location);
 
         setRadius(3);
@@ -23,7 +23,7 @@ public class Bullet extends DynamicCircleEntity implements Collider, SceneBorder
         double angle = calculateAngle(location, target);
         setMotion(10, angle); // speed of 10
 
-        this.targetEntity = targetEntity;
+//        this.targetEntity = targetEntity;
     }
 
     public YaegerEntity getTargetEntity(){
