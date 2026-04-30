@@ -112,7 +112,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
             dy /= length;
             double angle = Math.toDegrees(Math.atan2(dx, -dy));
 
-            setMotion(movementSpeed,angle );
+            setMotion(movementSpeed, angle);
         } else {
             setSpeed(0);
         }

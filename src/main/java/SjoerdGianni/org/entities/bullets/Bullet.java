@@ -1,6 +1,5 @@
 package SjoerdGianni.org.entities.bullets;
 
-import SjoerdGianni.org.entities.player.Player;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.Collider;
 import com.github.hanyaeger.api.entities.SceneBorderCrossingWatcher;
@@ -10,7 +9,7 @@ import javafx.scene.paint.Color;
 
 public class Bullet extends DynamicCircleEntity implements Collider, SceneBorderCrossingWatcher {
 
-    private Class<?> targetType; // Needs to be worked out better: goal is to make bullet only hit specific targets (e.g. Player or Enemy)
+    private Class<?> targetType;
     private int damagePoints;
 
     public Bullet(Coordinate2D location, Coordinate2D target, int damagePoints, Class<?> targetType) {
