@@ -1,18 +1,19 @@
 package SjoerdGianni.org.entities.bullets;
 
+import SjoerdGianni.org.entities.player.Player;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.Collider;
 import com.github.hanyaeger.api.entities.SceneBorderCrossingWatcher;
-import com.github.hanyaeger.api.entities.YaegerEntity;
 import com.github.hanyaeger.api.entities.impl.DynamicCircleEntity;
 import com.github.hanyaeger.api.scenes.SceneBorder;
 import javafx.scene.paint.Color;
 
 public class Bullet extends DynamicCircleEntity implements Collider, SceneBorderCrossingWatcher {
 
-    private YaegerEntity targetEntity; // Needs to be worked out better: goal is to make bullet only hit specific targets (e.g. Player or Enemy)
+    private Class<?> targetType; // Needs to be worked out better: goal is to make bullet only hit specific targets (e.g. Player or Enemy)
+    private int damagePoints;
 
-    public Bullet(Coordinate2D location, Coordinate2D target) {
+    public Bullet(Coordinate2D location, Coordinate2D target, int damagePoints, Class<?> targetType) {
         super(location);
 
         setRadius(3);
@@ -21,13 +22,19 @@ public class Bullet extends DynamicCircleEntity implements Collider, SceneBorder
         setStrokeWidth(1);
 
         double angle = calculateAngle(location, target);
-        setMotion(10, angle); // speed of 10
+        setMotion(10, angle);
 
-//        this.targetEntity = targetEntity;
+        this.damagePoints = damagePoints;
+
+        this.targetType = targetType;
     }
 
-    public YaegerEntity getTargetEntity(){
-        return targetEntity;
+    public Class<?> getTargetType(){
+        return targetType;
+    }
+
+    public int getDamagePoints(){
+        return damagePoints;
     }
 
     private double calculateAngle(Coordinate2D startPosition, Coordinate2D endPosition){

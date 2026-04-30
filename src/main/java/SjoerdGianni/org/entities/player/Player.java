@@ -1,6 +1,7 @@
 package SjoerdGianni.org.entities.player;
 
 import SjoerdGianni.org.entities.bullets.Bullet;
+import SjoerdGianni.org.entities.enemies.Enemy;
 import SjoerdGianni.org.scenes.GameScene;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.UpdateExposer;
@@ -10,9 +11,6 @@ import com.github.hanyaeger.api.entities.SceneBorderTouchingWatcher;
 import com.github.hanyaeger.api.entities.impl.DynamicCircleEntity;
 import com.github.hanyaeger.api.scenes.SceneBorder;
 import com.github.hanyaeger.api.userinput.KeyListener;
-import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
-import com.github.hanyaeger.api.userinput.MouseButtonReleasedListener;
-import com.github.hanyaeger.api.userinput.MouseMovedListener;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
@@ -23,12 +21,14 @@ import java.util.Set;
 public class Player extends DynamicCircleEntity implements KeyListener, Collided,
         SceneBorderTouchingWatcher, UpdateExposer {
     private int lives = 3;
-    private double playerSpeed;
+    private double movementSpeed;
     private long lastShotTime;
     private final int baseAttackSpeedInMs;
     private int attackSpeedInMs;
+    private final int baseAttackDamage;
+    private int attackDamage;
 
-
+    private static Coordinate2D currentPosition;
 
     private Coordinate2D mousePosition;
     private boolean mousePressed = false;
@@ -41,10 +41,13 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         setStrokeColor(Color.DARKGRAY);
         setStrokeWidth(2);
 
-        playerSpeed = 3.0;
+        movementSpeed = 3.0;
         baseAttackSpeedInMs = 250;
         attackSpeedInMs = baseAttackSpeedInMs;
-        lastShotTime = -baseAttackSpeedInMs;
+        lastShotTime = -baseAttackSpeedInMs; // Allow player to shoot directly from the game's start
+        baseAttackDamage = 10;
+        attackDamage = baseAttackDamage;
+
         mousePosition = initialLocation;
     }
 
@@ -53,6 +56,8 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
      */
     @Override
     public void explicitUpdate(final long timestamp) {
+        currentPosition = getAnchorLocation();
+
         if (mousePressed){
             shoot();
         }
@@ -61,7 +66,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     /**
      * Checks if enough time has passed to shoot again
      */
-    private boolean canShoot(){
+    private boolean canShoot() {
         return (GameScene.getTimestamp() - lastShotTime) >= attackSpeedInMs;
     }
 
@@ -69,12 +74,12 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         if (!canShoot()){
             return;
         }
-        GameScene.spawnBullet(new Bullet(getPlayerPosition(), mousePosition));
+        GameScene.spawnBullet(new Bullet(getPlayerPosition(), mousePosition, attackDamage, Enemy.class));
         lastShotTime = GameScene.getTimestamp();
     }
 
-    private Coordinate2D getPlayerPosition(){
-        return getAnchorLocation();
+    public static Coordinate2D getPlayerPosition(){
+        return currentPosition;
     }
 
     /**
@@ -99,7 +104,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
             dy /= length;
 
             // Calculate angle: 0° = up, 90° = right, 180° = down, 270° = left
-            setMotion(playerSpeed, Math.toDegrees(Math.atan2(dx, -dy)));
+            setMotion(movementSpeed, Math.toDegrees(Math.atan2(dx, -dy)));
         } else {
             setSpeed(0);
         }
@@ -147,7 +152,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     }
 
     public void onMouseButtonPressed(MouseButton button, Coordinate2D coordinate2D) {
-        if (button != MouseButton.PRIMARY){
+        if (isIncorrectMouseButton(button)){
             return;
         }
 
@@ -156,7 +161,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     }
 
     public void onMouseButtonReleased(MouseButton button, Coordinate2D coordinate2D) {
-        if (button != MouseButton.PRIMARY){
+        if (isIncorrectMouseButton(button)){
             return;
         }
 
@@ -168,9 +173,18 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         mousePosition = coordinate2D;
     }
 
+    private boolean isIncorrectMouseButton(MouseButton button){
+        return button != MouseButton.PRIMARY;
+    }
+
+    private void onDeath(){
+        mousePressed = false;
+
+    }
+
     @Override
     public void remove() {
         super.remove();
-        mousePressed = false;
+        onDeath();
     }
 }
