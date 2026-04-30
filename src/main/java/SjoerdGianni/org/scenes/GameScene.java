@@ -1,28 +1,27 @@
 package SjoerdGianni.org.scenes;
 
+import SjoerdGianni.org.entities.LabelBox;
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.enemies.NormalEnemy;
-import SjoerdGianni.org.entities.enemies.SquareEnemy;
 import SjoerdGianni.org.entities.player.Player;
-import com.github.hanyaeger.api.EntitySpawnerContainer;
-import com.github.hanyaeger.api.YaegerGame;
+import com.github.hanyaeger.api.*;
 import com.github.hanyaeger.api.entities.EntitySpawner;
-import com.github.hanyaeger.api.scenes.DynamicScene;
-import com.github.hanyaeger.api.Coordinate2D;
-import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
-import com.github.hanyaeger.api.userinput.*;
+import com.github.hanyaeger.api.scenes.DynamicScene;
+import com.github.hanyaeger.api.userinput.KeyListener;
+import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
+import com.github.hanyaeger.api.userinput.MouseButtonReleasedListener;
+import com.github.hanyaeger.api.userinput.MouseMovedWhileDraggingListener;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import SjoerdGianni.org.entities.*;
 
 import java.util.ArrayList;
 import java.util.Set;
 
-public class GameScene extends DynamicScene implements EntitySpawnerContainer, KeyListener, MouseButtonPressedListener, MouseButtonReleasedListener, MouseMovedWhileDraggingListener {
+public class GameScene extends DynamicScene implements EntitySpawnerContainer, KeyListener, MouseButtonPressedListener, MouseButtonReleasedListener, MouseMovedWhileDraggingListener, UpdateExposer {
     private final YaegerGame yaegerGame;
 
     private Player player;
@@ -74,8 +73,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         addEntity(playerLabel);
 
         // Enemies on the right side
-        var normalEnemy = new NormalEnemy(new Coordinate2D(1000, 200));
-        addEntity(normalEnemy);
+        var normalEnemy1 = new NormalEnemy(new Coordinate2D(1000, 200));
+        addEntity(normalEnemy1);
 
         var enemy1Label = new TextEntity(new Coordinate2D(1015, 250), "[enemy1]");
         enemy1Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
@@ -83,31 +82,32 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         enemy1Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         addEntity(enemy1Label);
 
-        var squareEnemy = new SquareEnemy(new Coordinate2D(1000, 360));
-        addEntity(squareEnemy);
+        var normalEnemy2 = new NormalEnemy(new Coordinate2D(1015, 360));
+        addEntity(normalEnemy2);
 
         var enemy2Label = new TextEntity(new Coordinate2D(1015, 410), "[enemy2]");
         enemy2Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         enemy2Label.setFill(Color.WHITE);
         enemy2Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         addEntity(enemy2Label);
+
+
+        var normalEnemy3 = new NormalEnemy(new Coordinate2D(1015, 510));
+        addEntity(normalEnemy3);
+
+        var enemy3Label = new TextEntity(new Coordinate2D(1015, 560), "[enemy3]");
+        enemy3Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        enemy3Label.setFill(Color.WHITE);
+        enemy3Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        addEntity(enemy3Label);
     }
 
     @Override
     public void setupEntitySpawners() {
-        // Main game update loop - runs frequently to handle player updates and bullet spawning
-        addEntitySpawner(new EntitySpawner(50) { // 50ms = 20 times per second
+        addEntitySpawner(new EntitySpawner(50) {
             @Override
             protected void spawnEntities() {
                 if (!isGameOver) {
-//                    // Update player (handles shooting)
-//                    player.updatePlayer();
-//                    // Update all enemies
-//                    enemies.removeIf(enemy -> enemy == null || !enemy.isActive());
-//                    for (EnemyEntity enemy : enemies) {
-//                        enemy.updateEnemy();
-//                    }
-                    // Spawn any bullets that were created
                     processBulletSpawns();
                 }
             }
@@ -132,6 +132,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
 //                }
 //            }
 //        });
+
     }
 
 
@@ -144,6 +145,13 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
             addEntity(bullet);
         }
         bulletsToSpawn.clear();
+    }
+
+    @Override
+    public void explicitUpdate(long timestamp) {
+        if (player != null && !player.isAlive()){
+            yaegerGame.setActiveScene(2);
+        }
     }
 
     @Override

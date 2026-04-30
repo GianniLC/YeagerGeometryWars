@@ -3,6 +3,7 @@ package SjoerdGianni.org.entities.player;
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.enemies.Enemy;
 import SjoerdGianni.org.scenes.GameScene;
+import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.UpdateExposer;
 import com.github.hanyaeger.api.entities.Collided;
@@ -33,6 +34,8 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     private Coordinate2D mousePosition;
     private boolean mousePressed = false;
 
+    private boolean alive = true;
+
     public Player(Coordinate2D initialLocation) {
         System.out.println("Player created");
         super(initialLocation);
@@ -40,6 +43,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         setFill(Color.GRAY);
         setStrokeColor(Color.DARKGRAY);
         setStrokeWidth(2);
+        setAnchorPoint(AnchorPoint.CENTER_CENTER);
 
         movementSpeed = 3.0;
         baseAttackSpeedInMs = 250;
@@ -82,6 +86,10 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         return currentPosition;
     }
 
+    public boolean isAlive(){
+        return alive;
+    }
+
     /**
      * Handles player movement with WASD keys.
      */
@@ -102,25 +110,46 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
             double length = Math.sqrt(dx * dx + dy * dy);
             dx /= length;
             dy /= length;
+            double angle = Math.toDegrees(Math.atan2(dx, -dy));
 
-            // Calculate angle: 0° = up, 90° = right, 180° = down, 270° = left
-            setMotion(movementSpeed, Math.toDegrees(Math.atan2(dx, -dy)));
+            setMotion(movementSpeed,angle );
         } else {
             setSpeed(0);
         }
     }
 
+    private void alterLives(int change) {
+        lives += change;
+
+        if (lives <= 0){
+            this.remove();
+        }
+    }
+
+    private void onHitByEnemy(Enemy enemy){
+        enemy.remove();
+        alterLives(-1);
+        System.out.println("Hit by Enemy");
+    }
+
+    private void onHitByBullet(Bullet bullet){
+        bullet.remove();
+        alterLives(-1);
+    }
+
     @Override
     public void onCollision(List<Collider> collidingObjects) {
-        System.out.println("Test collison");
-//        for (Collider collider : collidingObjects) {
-//            if (collider instanceof EnemyEntity) {
-//                takeDamage();
-//                ((EnemyEntity) collider).remove();
-//            } else if (collider instanceof PowerUpEntity) {
-//
-//            }
-//        }
+        for (Collider collider : collidingObjects) {
+            if (collider instanceof Enemy) {
+                Enemy enemy = (Enemy)collider;
+                onHitByEnemy(enemy);
+            } else if (collider instanceof Bullet){
+                Bullet bullet = (Bullet)collider;
+                if (bullet.getTargetType() == Player.class){
+                    onHitByBullet(bullet);
+                }
+            }
+        }
     }
 
     /**
@@ -178,6 +207,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     }
 
     private void onDeath(){
+        alive = false;
         mousePressed = false;
 
     }

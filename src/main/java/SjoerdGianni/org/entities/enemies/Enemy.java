@@ -2,6 +2,7 @@ package SjoerdGianni.org.entities.enemies;
 
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.player.Player;
+import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.UpdateExposer;
 import com.github.hanyaeger.api.entities.Collided;
@@ -22,6 +23,7 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
         setFill(color);
         setStrokeColor(color.darker());
         setStrokeWidth(2);
+        setAnchorPoint(AnchorPoint.CENTER_CENTER);
 
         this.hitPoints = hitPoints;
         this.movementSpeed = movementSpeed;
@@ -71,7 +73,7 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
     private void onDeath(){
         // For future implementation:
         // - Increase score of scoreboard
-        // - Chance of dropping a specific powerup
+        // - (Through @Override in a child class) Chance of dropping a specific powerup
     }
 
     @Override
