@@ -49,7 +49,7 @@ public class EndScene extends StaticScene implements KeyListener {
 
         var instructionText = new TextEntity(
             new Coordinate2D(640, 400),
-            "Press E to return to title"
+            "Press SPACE to return to title"
         );
         instructionText.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         instructionText.setFill(Color.LIGHTGRAY);
@@ -59,7 +59,7 @@ public class EndScene extends StaticScene implements KeyListener {
 
     @Override
     public void onPressedKeysChange(Set<KeyCode> input) {
-        if (input.contains(KeyCode.E)) {
+        if (input.contains(KeyCode.SPACE)) {
             yaegerGame.setActiveScene(0);
         }
     }

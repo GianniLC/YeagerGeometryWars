@@ -1,4 +1,4 @@
-package SjoerdGianni.org.entities;
+package SjoerdGianni.org.entities.enemies;
 
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.impl.RectangleEntity;
