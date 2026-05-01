@@ -129,7 +129,6 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     private void onHitByEnemy(Enemy enemy){
         enemy.remove();
         alterLives(-1);
-        System.out.println("Hit by Enemy");
     }
 
     private void onHitByBullet(Bullet bullet){
