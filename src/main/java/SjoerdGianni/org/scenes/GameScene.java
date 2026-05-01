@@ -4,14 +4,12 @@ import SjoerdGianni.org.entities.LabelBox;
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.enemies.NormalEnemy;
 import SjoerdGianni.org.entities.player.Player;
+import SjoerdGianni.org.entities.powerups.Powerup;
 import com.github.hanyaeger.api.*;
 import com.github.hanyaeger.api.entities.EntitySpawner;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.scenes.DynamicScene;
-import com.github.hanyaeger.api.userinput.KeyListener;
-import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
-import com.github.hanyaeger.api.userinput.MouseButtonReleasedListener;
-import com.github.hanyaeger.api.userinput.MouseMovedWhileDraggingListener;
+import com.github.hanyaeger.api.userinput.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
@@ -21,11 +19,13 @@ import javafx.scene.text.FontWeight;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class GameScene extends DynamicScene implements EntitySpawnerContainer, KeyListener, MouseButtonPressedListener, MouseButtonReleasedListener, MouseMovedWhileDraggingListener, UpdateExposer {
+public class GameScene extends DynamicScene implements EntitySpawnerContainer, KeyListener, MouseButtonPressedListener,
+        MouseButtonReleasedListener, MouseMovedWhileDraggingListener, UpdateExposer {
     private final YaegerGame yaegerGame;
 
     private Player player;
     private static final ArrayList<Bullet> bulletsToSpawn = new ArrayList<Bullet>();
+    private static final ArrayList<Powerup> powerupsToSpawn = new ArrayList<Powerup>();
     private boolean isGameOver = false;
 
     public GameScene(YaegerGame yaegerGame) {
@@ -33,13 +33,16 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     }
 
     /**
-     * Helper function to get a timestamp. This function is targeted for usage by entities in the GameScene, and is
-     * static to prevent an GameInstance object from needing to be passed to other classes to access this function.
+     * Helper function to get a timestamp. This function is targeted for usage by
+     * entities in the GameScene, and is
+     * static to prevent an GameInstance object from needing to be passed to other
+     * classes to access this function.
      *
      * @return current timestamp in milliseconds
      */
     public static long getTimestamp() {
-        // Using `System.currentTimeMillis()` for time intervals, because this function is the more performant option
+        // Using `System.currentTimeMillis()` for time intervals, because this function
+        // is the more performant option
         // compared to the earlier considered `System.nanoTime()`:
         // https://www.geeksforgeeks.org/java/java-system-nanotime-vs-system-currenttimemillis/
         return System.currentTimeMillis();
@@ -62,7 +65,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         sceneLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         addEntity(sceneLabel);
 
-        player = new Player(new Coordinate2D(getWidth()/2, getHeight()/2));
+        player = new Player(new Coordinate2D(getWidth() / 2, getHeight() / 2));
         player.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         addEntity(player);
 
@@ -91,7 +94,6 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         enemy2Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         addEntity(enemy2Label);
 
-
         var normalEnemy3 = new NormalEnemy(new Coordinate2D(1015, 510));
         addEntity(normalEnemy3);
 
@@ -113,28 +115,27 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
             }
         });
 
-//        // Enemy spawner
-//        addEntitySpawner(new EntitySpawner(enemySpawnInterval) {
-//            @Override
-//            protected void spawnEntities() {
-//                if (!isGameOver) {
-//                    spawnRandomEnemy();
-//                }
-//            }
-//        });
-//
-//        // PowerUp spawner
-//        addEntitySpawner(new EntitySpawner(powerUpSpawnInterval) {
-//            @Override
-//            protected void spawnEntities() {
-//                if (!isGameOver) {
-//                    spawnRandomPowerUp();
-//                }
-//            }
-//        });
+        // // Enemy spawner
+        // addEntitySpawner(new EntitySpawner(enemySpawnInterval) {
+        // @Override
+        // protected void spawnEntities() {
+        // if (!isGameOver) {
+        // spawnRandomEnemy();
+        // }
+        // }
+        // });
+        //
+        // PowerUp spawner
+        addEntitySpawner(new EntitySpawner(50) {
+            @Override
+            protected void spawnEntities() {
+                if (!isGameOver) {
+                    processPowerupSpawns();
+                }
+            }
+        });
 
     }
-
 
     public static void spawnBullet(Bullet bullet) {
         bulletsToSpawn.add(bullet);
@@ -147,9 +148,23 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         bulletsToSpawn.clear();
     }
 
+    public static void spawnPowerup(Powerup powerup) {
+        powerupsToSpawn.add(powerup);
+    }
+
+    private void processPowerupSpawns() {
+        for (Powerup powerup : powerupsToSpawn) {
+            addEntity(powerup);
+        }
+        powerupsToSpawn.clear();
+    }
+
+    /**
+     * Main game update loop. Fires on every frame.
+     */
     @Override
     public void explicitUpdate(long timestamp) {
-        if (player != null && !player.isAlive()){
+        if (player != null && !player.isAlive()) {
             yaegerGame.setActiveScene(2);
         }
     }
@@ -163,26 +178,32 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
 
     @Override
     public void onMouseButtonPressed(MouseButton button, Coordinate2D coordinate2D) {
-        System.out.println("Mouse pressed with button "+ button+" and coordinate "+ coordinate2D);
-        if (player == null){
+        ;
+        if (player == null) {
             return;
         }
 
-       player.onMouseButtonPressed(button, coordinate2D);
+        player.onMouseButtonPressed(button, coordinate2D);
     }
 
     @Override
     public void onMouseButtonReleased(MouseButton button, Coordinate2D coordinate2D) {
-        if (player == null){
+        if (player == null) {
             return;
         }
 
         player.onMouseButtonReleased(button, coordinate2D);
     }
 
+    /**
+     * Updates coordinates when dragging the mouse.
+     * <p>
+     * This function should be used instead of `onMouseMoved` from the `MouseMovedListener` interface, because that
+     * function stops updating the mouse position once a mouse button is held down.
+     */
     @Override
     public void onMouseMovedWhileDragging(Coordinate2D coordinate2D) {
-        if (player == null){
+        if (player == null) {
             return;
         }
         player.onMouseDragged(coordinate2D);

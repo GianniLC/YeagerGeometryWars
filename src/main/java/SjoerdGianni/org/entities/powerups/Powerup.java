@@ -1,16 +1,12 @@
 package SjoerdGianni.org.entities.powerups;
 
-import SjoerdGianni.org.entities.player.Player;
 import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
-import com.github.hanyaeger.api.entities.Collided;
 import com.github.hanyaeger.api.entities.Collider;
 import com.github.hanyaeger.api.entities.impl.CircleEntity;
 import javafx.scene.paint.Color;
 
-import java.util.List;
-
-public abstract class Powerup extends CircleEntity implements Collided {
+public abstract class Powerup extends CircleEntity implements Collider {
 
     protected Powerup(Coordinate2D initialLocation, Color strokeColor) {
         super(initialLocation);
@@ -22,16 +18,12 @@ public abstract class Powerup extends CircleEntity implements Collided {
         setAnchorPoint(AnchorPoint.CENTER_CENTER);
     }
 
+    /**
+     * Activate the effect of the powerup
+     *
+     * @implSpec Always call `super.applyEffect()` when overriding this method
+     */
     public void applyEffect() {
         remove();
     };
-
-    @Override
-    public void onCollision(List<Collider> collidingObjects) {
-        for (Collider collider : collidingObjects){
-            if (collider instanceof Player) {
-                applyEffect();
-            }
-        }
-    }
 }
