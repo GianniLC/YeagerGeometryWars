@@ -2,6 +2,7 @@ package SjoerdGianni.org.entities.player;
 
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.enemies.Enemy;
+import SjoerdGianni.org.entities.powerups.Powerup;
 import SjoerdGianni.org.scenes.GameScene;
 import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
@@ -56,7 +57,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     }
 
     /**
-     * Used to handle updates which run every frame.
+     * Update loop which triggers each frame
      */
     @Override
     public void explicitUpdate(final long timestamp) {
@@ -118,11 +119,16 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         }
     }
 
+    /**
+     * Alter the number of lives the player has. When no lives are left, the `onDeath` logic is triggered.
+     * @param change Value for changing the number of lives. Use a negative value for decreasing, and a positive value
+     *               for increasing
+     */
     private void alterLives(int change) {
         lives += change;
 
         if (lives <= 0){
-            this.remove();
+            this.onDeath();
         }
     }
 
@@ -147,6 +153,8 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
                 if (bullet.getTargetType() == Player.class){
                     onHitByBullet(bullet);
                 }
+            } else if (collider instanceof Powerup){
+                ((Powerup)collider).applyEffect();
             }
         }
     }
@@ -197,7 +205,6 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     }
 
     public void onMouseDragged(Coordinate2D coordinate2D) {
-        System.out.println("Mouse moved to coordinate "+ coordinate2D);
         mousePosition = coordinate2D;
     }
 
@@ -208,12 +215,6 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     private void onDeath(){
         alive = false;
         mousePressed = false;
-
-    }
-
-    @Override
-    public void remove() {
-        super.remove();
-        onDeath();
+        remove();
     }
 }
