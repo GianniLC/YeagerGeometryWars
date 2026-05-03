@@ -29,6 +29,8 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     private int attackSpeedInMs;
     private final int baseAttackDamage;
     private int attackDamage;
+    private final int baseBulletMovementSpeed;
+    private int bulletMovementSpeed;
 
     private static Coordinate2D currentPosition;
 
@@ -38,7 +40,6 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     private boolean alive = true;
 
     public Player(Coordinate2D initialLocation) {
-        System.out.println("Player created");
         super(initialLocation);
         setRadius(15);
         setFill(Color.GRAY);
@@ -52,6 +53,8 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         lastShotTime = -baseAttackSpeedInMs; // Allow player to shoot directly from the game's start
         baseAttackDamage = 10;
         attackDamage = baseAttackDamage;
+        baseBulletMovementSpeed = 10;
+        bulletMovementSpeed = baseBulletMovementSpeed;
 
         mousePosition = initialLocation;
     }
@@ -79,7 +82,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         if (!canShoot()){
             return;
         }
-        GameScene.spawnBullet(new Bullet(getPlayerPosition(), mousePosition, attackDamage, Enemy.class));
+        GameScene.spawnBullet(new Bullet(getPlayerPosition(), mousePosition, attackDamage, Enemy.class, bulletMovementSpeed));
         lastShotTime = GameScene.getTimestamp();
     }
 
