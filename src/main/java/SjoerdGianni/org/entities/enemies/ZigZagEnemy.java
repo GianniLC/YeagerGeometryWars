@@ -10,7 +10,7 @@ public class ZigZagEnemy extends Enemy{
     private boolean positiveDeviationAngle = true;
     private double deviationAngleInDegrees;
 
-    private double movementAngle = 0;
+    private double movementAngle;
 
     private long lastZigZagTimestamp;
     private int zigZagIntervalInMs;
@@ -43,7 +43,10 @@ public class ZigZagEnemy extends Enemy{
             double angle = Math.toDegrees(Math.atan2(dx, dy));
             angle += positiveDeviationAngle ? deviationAngleInDegrees : -deviationAngleInDegrees;
             movementAngle = angle;
+
             positiveDeviationAngle = !positiveDeviationAngle;
+            setRotate(movementAngle); // Rotate the enemy to face towards the movement direction
+
             lastZigZagTimestamp = GameScene.getTimestamp();
         }
 

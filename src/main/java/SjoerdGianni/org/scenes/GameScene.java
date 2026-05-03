@@ -2,7 +2,8 @@ package SjoerdGianni.org.scenes;
 
 import SjoerdGianni.org.entities.LabelBox;
 import SjoerdGianni.org.entities.bullets.Bullet;
-import SjoerdGianni.org.entities.enemies.NormalEnemy;
+import SjoerdGianni.org.entities.enemies.BossEnemy;
+import SjoerdGianni.org.entities.enemies.SpikeEnemy;
 import SjoerdGianni.org.entities.enemies.ZigZagEnemy;
 import SjoerdGianni.org.entities.player.Player;
 import SjoerdGianni.org.entities.powerups.Powerup;
@@ -10,7 +11,10 @@ import com.github.hanyaeger.api.*;
 import com.github.hanyaeger.api.entities.EntitySpawner;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.scenes.DynamicScene;
-import com.github.hanyaeger.api.userinput.*;
+import com.github.hanyaeger.api.userinput.KeyListener;
+import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
+import com.github.hanyaeger.api.userinput.MouseButtonReleasedListener;
+import com.github.hanyaeger.api.userinput.MouseMovedWhileDraggingListener;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
@@ -77,8 +81,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         addEntity(playerLabel);
 
         // Enemies on the right side
-        var normalEnemy1 = new NormalEnemy(new Coordinate2D(1000, 200));
-        addEntity(normalEnemy1);
+        var bossEnemy = new BossEnemy(new Coordinate2D(1000, 200));
+        addEntity(bossEnemy);
 
         var enemy1Label = new TextEntity(new Coordinate2D(1015, 250), "[enemy1]");
         enemy1Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
@@ -95,8 +99,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         enemy2Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         addEntity(enemy2Label);
 
-        var normalEnemy3 = new NormalEnemy(new Coordinate2D(1015, 510));
-        addEntity(normalEnemy3);
+        var spikeEnemy = new SpikeEnemy(new Coordinate2D(1015, 510));
+        addEntity(spikeEnemy);
 
         var enemy3Label = new TextEntity(new Coordinate2D(1015, 560), "[enemy3]");
         enemy3Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
