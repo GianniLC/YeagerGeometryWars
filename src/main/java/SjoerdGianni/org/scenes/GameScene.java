@@ -3,6 +3,7 @@ package SjoerdGianni.org.scenes;
 import SjoerdGianni.org.entities.LabelBox;
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.enemies.NormalEnemy;
+import SjoerdGianni.org.entities.enemies.ZigZagEnemy;
 import SjoerdGianni.org.entities.player.Player;
 import SjoerdGianni.org.entities.powerups.Powerup;
 import com.github.hanyaeger.api.*;
@@ -85,8 +86,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         enemy1Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         addEntity(enemy1Label);
 
-        var normalEnemy2 = new NormalEnemy(new Coordinate2D(1015, 360));
-        addEntity(normalEnemy2);
+        var zigZagEnemy = new ZigZagEnemy(new Coordinate2D(1015, 360));
+        addEntity(zigZagEnemy);
 
         var enemy2Label = new TextEntity(new Coordinate2D(1015, 410), "[enemy2]");
         enemy2Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);

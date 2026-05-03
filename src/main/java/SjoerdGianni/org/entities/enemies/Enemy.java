@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Enemy extends DynamicRectangleEntity implements Collider, Collided, UpdateExposer {
-    private int hitPoints;
-    private final double movementSpeed;
+    protected int hitPoints;
+    protected final double movementSpeed;
 
     private static final List<Enemy> allEnemies = new ArrayList<>();
 
