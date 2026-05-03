@@ -2,12 +2,13 @@ package SjoerdGianni.org.entities.enemies;
 
 import SjoerdGianni.org.entities.player.Player;
 import SjoerdGianni.org.scenes.GameScene;
+import SjoerdGianni.org.shared.MathHelper;
 import com.github.hanyaeger.api.Coordinate2D;
 import javafx.scene.paint.Color;
 
 public class ZigZagEnemy extends Enemy{
 
-    private boolean positiveDeviationAngle = true;
+    private boolean positiveDeviationAngle;
     private double deviationAngleInDegrees;
 
     private double movementAngle;
@@ -33,14 +34,8 @@ public class ZigZagEnemy extends Enemy{
 
     @Override
     public void move(){
-        Coordinate2D playerPosition = Player.getPlayerPosition();
-        Coordinate2D enemyPosition = getAnchorLocation();
-
-        double dx = playerPosition.getX() - enemyPosition.getX();
-        double dy = playerPosition.getY() - enemyPosition.getY();
-
         if (shouldZigZag()){
-            double angle = Math.toDegrees(Math.atan2(dx, dy));
+            double angle = MathHelper.calculateAngleInDegrees(getAnchorLocation(), Player.getPlayerPosition());
             angle += positiveDeviationAngle ? deviationAngleInDegrees : -deviationAngleInDegrees;
             movementAngle = angle;
 
