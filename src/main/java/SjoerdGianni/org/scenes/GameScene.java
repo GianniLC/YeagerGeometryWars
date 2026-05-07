@@ -60,16 +60,82 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
 
     @Override
     public void setupEntities() {
-        // Scene label box
-        var sceneBox = new LabelBox(new Coordinate2D(10, 10), 200, 40);
-        addEntity(sceneBox);
+        // Health bar (top left) - now with red color
+        var healthLabel = new TextEntity(new Coordinate2D(30, 30), "HEALTH:");
+        healthLabel.setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        healthLabel.setFill(Color.WHITE);
+        healthLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        addEntity(healthLabel);
 
-        var sceneLabel = new TextEntity(new Coordinate2D(110, 30), "GAME SCENE");
-        sceneLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        sceneLabel.setFill(Color.BLACK);
-        sceneLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        addEntity(sceneLabel);
+        // Health indicator hearts - no boxes, just hearts
+        for (int i = 0; i < 3; i++) {
+            var heart = new TextEntity(new Coordinate2D(115 + (i * 35), 28), "♥");
+            heart.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+            heart.setFill(Color.RED);
+            heart.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+            addEntity(heart);
+        }
 
+        // Score display (top center) - no box, just white text
+        var scoreLabel = new TextEntity(new Coordinate2D(640, 30), "SCORE");
+        scoreLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        scoreLabel.setFill(Color.LIGHTGRAY);
+        scoreLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        addEntity(scoreLabel);
+        
+        var scoreValue = new TextEntity(new Coordinate2D(640, 60), "0000");
+        scoreValue.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        scoreValue.setFill(Color.WHITE);
+        scoreValue.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+        addEntity(scoreValue);
+
+        // Compact power-up indicators (top right) - minimal design
+        // Triple Shot - small text and bar
+        var tripleShotLabel = new TextEntity(new Coordinate2D(1200, 30), "TRIPLE SHOT");
+        tripleShotLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        tripleShotLabel.setFill(Color.CYAN);
+        tripleShotLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        addEntity(tripleShotLabel);
+
+        // Compact progress bar (cyan/blue)
+        var progressBarBg = new LabelBox(new Coordinate2D(1140, 45), 120, 8);
+        addEntity(progressBarBg);
+
+        // Progress bar fill in cyan
+        var progressBarFill = new LabelBox(new Coordinate2D(1140, 45), 90, 8); // 75% filled
+        addEntity(progressBarFill);
+
+        var tripleShotTime = new TextEntity(new Coordinate2D(1200, 65), "75%");
+        tripleShotTime.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        tripleShotTime.setFill(Color.DARKGRAY);
+        tripleShotTime.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        addEntity(tripleShotTime);
+
+        // Second power-up slot - compact version
+        var powerupSlotLabel = new TextEntity(new Coordinate2D(1200, 90), "[Power-up]");
+        powerupSlotLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        powerupSlotLabel.setFill(Color.DARKGRAY);
+        powerupSlotLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 11));
+        addEntity(powerupSlotLabel);
+
+        // Small bar placeholder for second power-up
+        var powerupBar = new LabelBox(new Coordinate2D(1140, 100), 120, 8);
+        addEntity(powerupBar);
+
+        // Controls text (bottom right - no box, light gray)
+        var controlsTitle = new TextEntity(new Coordinate2D(1150, 655), "WASD - Move");
+        controlsTitle.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        controlsTitle.setFill(Color.DARKGRAY);
+        controlsTitle.setFont(Font.font("Arial", FontWeight.NORMAL, 13));
+        addEntity(controlsTitle);
+
+        var controlsSubtitle = new TextEntity(new Coordinate2D(1150, 675), "Mouse - Aim & Shoot");
+        controlsSubtitle.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        controlsSubtitle.setFill(Color.DARKGRAY);
+        controlsSubtitle.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        addEntity(controlsSubtitle);
+
+        // Player
         player = new Player(new Coordinate2D(getWidth() / 2, getHeight() / 2));
         player.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         addEntity(player);
