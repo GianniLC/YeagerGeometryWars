@@ -27,10 +27,13 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     private long lastShotTime;
     private final int baseAttackSpeedInMs;
     private int attackSpeedInMs;
+    private int resetAttackSpeedInMsTimestamp;
     private final int baseAttackDamage;
     private int attackDamage;
+    private int resetAttackDamageTimestamp;
     private final int baseBulletMovementSpeed;
     private int bulletMovementSpeed;
+    private int resetBulletMovementSpeedTimestamp;
 
     private static Coordinate2D currentPosition;
 
