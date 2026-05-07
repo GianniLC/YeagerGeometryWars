@@ -2,6 +2,7 @@ package SjoerdGianni.org.entities.enemies;
 
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.player.Player;
+import SjoerdGianni.org.shared.MathHelper;
 import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.UpdateExposer;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Enemy extends DynamicRectangleEntity implements Collider, Collided, UpdateExposer {
-    private int hitPoints;
-    private final double movementSpeed;
+    protected int hitPoints;
+    protected final double movementSpeed;
 
     private static final List<Enemy> allEnemies = new ArrayList<>();
 
@@ -57,12 +58,11 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
      * Move the enemy. Default implementation is to follow the player.
      */
     public void move() {
-        Coordinate2D playerPosition = Player.getPlayerPosition();
         Coordinate2D enemyPosition = getAnchorLocation();
+        Coordinate2D playerPosition = Player.getPlayerPosition();
 
-        double dx = playerPosition.getX() - enemyPosition.getX();
-        double dy = playerPosition.getY() - enemyPosition.getY();
-        double angle = Math.toDegrees(Math.atan2(dx, dy));
+
+        double angle = MathHelper.calculateAngleInDegrees(enemyPosition, playerPosition);
 
         setMotion(movementSpeed, angle);
     }
@@ -103,8 +103,12 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
         // For future implementation:
         // - Increase score of scoreboard
         // - (Through @Override in a child class) Chance of dropping a specific powerup
-
-        allEnemies.remove(this);
         remove();
+    }
+
+    @Override
+    public void remove(){
+        allEnemies.remove(this);
+        super.remove();
     }
 }

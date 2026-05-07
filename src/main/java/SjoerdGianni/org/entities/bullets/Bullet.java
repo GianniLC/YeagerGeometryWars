@@ -1,5 +1,7 @@
 package SjoerdGianni.org.entities.bullets;
 
+import SjoerdGianni.org.shared.MathHelper;
+import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.Collider;
 import com.github.hanyaeger.api.entities.SceneBorderCrossingWatcher;
@@ -12,20 +14,26 @@ public class Bullet extends DynamicCircleEntity implements Collider, SceneBorder
     private Class<?> targetType;
     private int damagePoints;
 
-    public Bullet(Coordinate2D location, Coordinate2D target, int damagePoints, Class<?> targetType) {
+    public Bullet(Coordinate2D location, double angleInDegrees , int damagePoints, Class<?> targetType, double movementSpeed ) {
         super(location);
 
         setRadius(3);
         setFill(Color.YELLOW);
         setStrokeColor(Color.WHITE);
         setStrokeWidth(1);
+        setAnchorPoint(AnchorPoint.CENTER_CENTER);
 
-        double angle = calculateAngle(location, target);
-        setMotion(10, angle);
+        setMotion(movementSpeed, angleInDegrees);
 
         this.damagePoints = damagePoints;
 
         this.targetType = targetType;
+    }
+
+    public Bullet(Coordinate2D location, Coordinate2D target, int damagePoints, Class<?> targetType, double movementSpeed ){
+        double angle = MathHelper.calculateAngleInDegrees(location, target);
+        this(location, angle, damagePoints, targetType, movementSpeed );
+
     }
 
     public Class<?> getTargetType(){
@@ -36,13 +44,7 @@ public class Bullet extends DynamicCircleEntity implements Collider, SceneBorder
         return damagePoints;
     }
 
-    private double calculateAngle(Coordinate2D startPosition, Coordinate2D endPosition){
-        double dx = endPosition.getX() - startPosition.getX();
-        double dy = endPosition.getY() - startPosition.getY();
-        // `dx` and `dy` are passed to `Math.atan2()` in this order because the positive Y-axis direction is downwards.
-        // Providing them in the opposite order causes the rotation direction to be inverted and 90 degrees off.
-        return Math.toDegrees(Math.atan2(dx, dy));
-    }
+
 
     @Override
     public void notifyBoundaryCrossing(SceneBorder border) {
