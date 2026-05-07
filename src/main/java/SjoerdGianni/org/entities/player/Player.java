@@ -127,7 +127,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
      * @param change Value for changing the number of lives. Use a negative value for decreasing, and a positive value
      *               for increasing
      */
-    private void alterLives(int change) {
+    public void alterLives(int change) {
         lives += change;
 
         if (lives <= 0){
@@ -157,7 +157,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
                     onHitByBullet(bullet);
                 }
             } else if (collider instanceof Powerup){
-                ((Powerup)collider).applyEffect();
+                ((Powerup)collider).applyEffect(this);
             }
         }
     }
