@@ -2,7 +2,7 @@ package SjoerdGianni.org.scenes;
 
 import SjoerdGianni.org.entities.LabelBox;
 import SjoerdGianni.org.entities.bullets.Bullet;
-import SjoerdGianni.org.entities.enemies.BossEnemy;
+import SjoerdGianni.org.entities.enemies.NormalEnemy;
 import SjoerdGianni.org.entities.enemies.SpikeEnemy;
 import SjoerdGianni.org.entities.enemies.ZigZagEnemy;
 import SjoerdGianni.org.entities.player.Player;
@@ -147,8 +147,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         addEntity(playerLabel);
 
         // Enemies on the right side
-        var bossEnemy = new BossEnemy(new Coordinate2D(1000, 200));
-        addEntity(bossEnemy);
+        var normalEnemy = new NormalEnemy(new Coordinate2D(1000, 200));
+        addEntity(normalEnemy);
 
         var enemy1Label = new TextEntity(new Coordinate2D(1015, 250), "[enemy1]");
         enemy1Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);

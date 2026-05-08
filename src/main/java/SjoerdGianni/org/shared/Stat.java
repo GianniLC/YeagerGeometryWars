@@ -5,7 +5,7 @@ public class Stat<T> {
     private T value;
     private long resetTimestamp;
 
-    Stat(T baseValue){
+     public Stat(T baseValue){
         this.baseValue = baseValue;
         value = baseValue;
         resetTimestamp = 0;

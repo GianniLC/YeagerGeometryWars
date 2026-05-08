@@ -1,6 +1,6 @@
 package SjoerdGianni.org.entities.enemies;
 
-import SjoerdGianni.org.entities.powerups.NukePowerup;
+import SjoerdGianni.org.entities.powerups.SlowdownPowerup;
 import com.github.hanyaeger.api.Coordinate2D;
 import javafx.scene.paint.Color;
 
@@ -11,7 +11,7 @@ public class NormalEnemy extends Enemy{
 
     @Override
     public void onDeath() {
-        dropPowerup(NukePowerup.class, 100);
+        dropPowerup(SlowdownPowerup.class, 100);
         super.onDeath();
     }
 }

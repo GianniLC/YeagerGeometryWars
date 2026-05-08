@@ -108,7 +108,7 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
     /**
      * Drops a specified powerup at the enemy's location
      * @param powerupClass Type of powerup that should be dropped
-     * @param dropChance Chance in percentage. The value must be between 0 and 100
+     * @param dropChance Chance in percentage. The value must be between 0.0 and 100.0
      */
     public final void dropPowerup(Class<? extends Powerup> powerupClass, double dropChance) {
         final double min = 0;

@@ -2,6 +2,7 @@ package SjoerdGianni.org.entities.enemies;
 
 import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.player.Player;
+import SjoerdGianni.org.entities.powerups.BulletPowerup;
 import SjoerdGianni.org.scenes.GameScene;
 import com.github.hanyaeger.api.Coordinate2D;
 import javafx.scene.paint.Color;
@@ -40,6 +41,7 @@ public class SpikeEnemy extends Enemy {
     @Override
     public void onDeath(){
         fireBulletPattern();
+        dropPowerup(BulletPowerup.class, 100);
         super.onDeath();
     }
 }

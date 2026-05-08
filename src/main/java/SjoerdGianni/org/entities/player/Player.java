@@ -4,6 +4,7 @@ import SjoerdGianni.org.entities.bullets.Bullet;
 import SjoerdGianni.org.entities.enemies.Enemy;
 import SjoerdGianni.org.entities.powerups.Powerup;
 import SjoerdGianni.org.scenes.GameScene;
+import SjoerdGianni.org.shared.Stat;
 import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.UpdateExposer;
@@ -23,17 +24,11 @@ import java.util.Set;
 public class Player extends DynamicCircleEntity implements KeyListener, Collided,
         SceneBorderTouchingWatcher, UpdateExposer {
     private int lives = 3;
-    private double movementSpeed;
     private long lastShotTime;
-    private final int baseAttackSpeedInMs;
-    private int attackSpeedInMs;
-    private int resetAttackSpeedInMsTimestamp;
-    private final int baseAttackDamage;
-    private int attackDamage;
-    private int resetAttackDamageTimestamp;
-    private final int baseBulletMovementSpeed;
-    private int bulletMovementSpeed;
-    private int resetBulletMovementSpeedTimestamp;
+    private final Stat<Double> movementSpeed;
+    private final Stat<Integer> attackSpeedInMs;
+    private final Stat<Integer> attackDamage;
+    private final Stat<Double> bulletMovementSpeed;
 
     private static Coordinate2D currentPosition;
 
@@ -50,14 +45,10 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         setStrokeWidth(2);
         setAnchorPoint(AnchorPoint.CENTER_CENTER);
 
-        movementSpeed = 3.0;
-        baseAttackSpeedInMs = 250;
-        attackSpeedInMs = baseAttackSpeedInMs;
-        lastShotTime = -baseAttackSpeedInMs; // Allow player to shoot directly from the game's start
-        baseAttackDamage = 10;
-        attackDamage = baseAttackDamage;
-        baseBulletMovementSpeed = 10;
-        bulletMovementSpeed = baseBulletMovementSpeed;
+        movementSpeed = new Stat<>(3.0);
+        attackSpeedInMs = new Stat<>(225);
+        attackDamage = new Stat<>(10);
+        bulletMovementSpeed = new Stat<>(10.0);
 
         mousePosition = initialLocation;
     }
@@ -67,6 +58,12 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
      */
     @Override
     public void explicitUpdate(final long timestamp) {
+        long currentTimestamp = GameScene.getTimestamp();
+        movementSpeed.update(currentTimestamp);
+        attackSpeedInMs.update(currentTimestamp);
+        attackDamage.update(currentTimestamp);
+        bulletMovementSpeed.update(currentTimestamp);
+
         currentPosition = getAnchorLocation();
 
         if (mousePressed){
@@ -74,18 +71,55 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         }
     }
 
+    public void setMovementSpeed(double modifier, int durationInMS){
+        long currentTimestamp = GameScene.getTimestamp();
+        double value = (double)(movementSpeed.getBaseValue() * modifier);
+        movementSpeed.applyTemporaryChange(value, durationInMS, currentTimestamp);
+    }
+
+    public void setAttackSpeedInMs(double modifier, int durationInMS){
+        long currentTimestamp = GameScene.getTimestamp();
+        double finalModifier = 1 / modifier; // Reverse modifier to make higher modifier have positive effect on attack speed
+        int value = (int)(attackSpeedInMs.getBaseValue() * finalModifier);
+        attackSpeedInMs.applyTemporaryChange(value, durationInMS, currentTimestamp);
+    }
+
+    public void setAttackDamage(double modifier, int durationInMs){
+        long currentTimestamp = GameScene.getTimestamp();
+        int value = (int)(attackDamage.getBaseValue() * modifier);
+        attackDamage.applyTemporaryChange(value, durationInMs, currentTimestamp);
+    }
+
+    public void setBulletMovementSpeed(double modifier, int durationInMs){
+        long currentTimestamp = GameScene.getTimestamp();
+        double value = (double)(bulletMovementSpeed.getBaseValue() * modifier);
+        bulletMovementSpeed.applyTemporaryChange(value, durationInMs, currentTimestamp);
+    }
+
+    public void activateBetterBullets(int durationInMs){
+        setAttackSpeedInMs(2.0, durationInMs);
+        setAttackDamage(1.5, durationInMs);
+        setBulletMovementSpeed(1.5, durationInMs);
+    }
+
+    public void activateSlowdown(int durationInMs){
+        setMovementSpeed(0.75, durationInMs);
+        setAttackSpeedInMs(0.75, durationInMs);
+        setBulletMovementSpeed(0.5, durationInMs);
+    }
+
     /**
      * Checks if enough time has passed to shoot again
      */
     private boolean canShoot() {
-        return (GameScene.getTimestamp() - lastShotTime) >= attackSpeedInMs;
+        return (GameScene.getTimestamp() - lastShotTime) >= attackSpeedInMs.getValue();
     }
 
     private void shoot(){
         if (!canShoot()){
             return;
         }
-        GameScene.spawnBullet(new Bullet(getPlayerPosition(), mousePosition, attackDamage, Enemy.class, bulletMovementSpeed));
+        GameScene.spawnBullet(new Bullet(getPlayerPosition(), mousePosition, attackDamage.getValue(), Enemy.class, bulletMovementSpeed.getValue()));
         lastShotTime = GameScene.getTimestamp();
     }
 
@@ -119,7 +153,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
             dy /= length;
             double angle = Math.toDegrees(Math.atan2(dx, -dy));
 
-            setMotion(movementSpeed, angle);
+            setMotion(movementSpeed.getValue(), angle);
         } else {
             setSpeed(0);
         }
