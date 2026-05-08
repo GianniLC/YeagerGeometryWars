@@ -71,37 +71,65 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         }
     }
 
-    public void setMovementSpeed(double modifier, int durationInMS){
+    /**
+     * Alter the movement speed for a specified duration
+     * @param modifier modifier to alter the value by. <1.0 = negative effect, >1.0 = positive effect
+     * @param durationInMs duration in milliseconds
+     */
+    public void setMovementSpeed(double modifier, int durationInMs){
         long currentTimestamp = GameScene.getTimestamp();
         double value = (double)(movementSpeed.getBaseValue() * modifier);
-        movementSpeed.applyTemporaryChange(value, durationInMS, currentTimestamp);
+        movementSpeed.applyTemporaryChange(value, durationInMs, currentTimestamp);
     }
 
-    public void setAttackSpeedInMs(double modifier, int durationInMS){
+    /**
+     * Alter the attack speed for a specified duration
+     * @param modifier modifier to alter the value by. <1.0 = negative effect, >1.0 = positive effect
+     * @param durationInMs duration in milliseconds
+     */
+    public void setAttackSpeedInMs(double modifier, int durationInMs){
         long currentTimestamp = GameScene.getTimestamp();
         double finalModifier = 1 / modifier; // Reverse modifier to make higher modifier have positive effect on attack speed
         int value = (int)(attackSpeedInMs.getBaseValue() * finalModifier);
-        attackSpeedInMs.applyTemporaryChange(value, durationInMS, currentTimestamp);
+        attackSpeedInMs.applyTemporaryChange(value, durationInMs, currentTimestamp);
     }
 
+    /**
+     * Alter the attack damage for a specified duration
+     * @param modifier modifier to alter the value by. <1.0 = negative effect, >1.0 = positive effect
+     * @param durationInMs duration in milliseconds
+     */
     public void setAttackDamage(double modifier, int durationInMs){
         long currentTimestamp = GameScene.getTimestamp();
         int value = (int)(attackDamage.getBaseValue() * modifier);
         attackDamage.applyTemporaryChange(value, durationInMs, currentTimestamp);
     }
 
+    /**
+     * Alter the bullet movement speed for a specified duration
+     * @param modifier modifier to alter the value by. <1.0 = negative effect, >1.0 = positive effect
+     * @param durationInMs duration in milliseconds
+     */
     public void setBulletMovementSpeed(double modifier, int durationInMs){
         long currentTimestamp = GameScene.getTimestamp();
         double value = (double)(bulletMovementSpeed.getBaseValue() * modifier);
         bulletMovementSpeed.applyTemporaryChange(value, durationInMs, currentTimestamp);
     }
 
+    /**
+     * Activate the 'better bullets' perk for faster and more powerfull bullets
+     * @param durationInMs duration in milliseconds
+     */
     public void activateBetterBullets(int durationInMs){
         setAttackSpeedInMs(2.0, durationInMs);
         setAttackDamage(1.5, durationInMs);
         setBulletMovementSpeed(1.5, durationInMs);
     }
 
+    /**
+     * Activate the 'slowdown' nerf for slower bullets and movement speed
+     * @param durationInMs duration in milliseconds
+     */
     public void activateSlowdown(int durationInMs){
         setMovementSpeed(0.75, durationInMs);
         setAttackSpeedInMs(0.75, durationInMs);
