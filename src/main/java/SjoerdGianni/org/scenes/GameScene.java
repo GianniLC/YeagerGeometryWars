@@ -13,20 +13,17 @@ import com.github.hanyaeger.api.*;
 import com.github.hanyaeger.api.entities.EntitySpawner;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.scenes.DynamicScene;
-import com.github.hanyaeger.api.userinput.KeyListener;
 import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
 import com.github.hanyaeger.api.userinput.MouseButtonReleasedListener;
 import com.github.hanyaeger.api.userinput.MouseMovedWhileDraggingListener;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import java.util.ArrayList;
-import java.util.Set;
 
-public class GameScene extends DynamicScene implements EntitySpawnerContainer, KeyListener, MouseButtonPressedListener,
+public class GameScene extends DynamicScene implements EntitySpawnerContainer, MouseButtonPressedListener,
         MouseButtonReleasedListener, MouseMovedWhileDraggingListener, UpdateExposer {
     private final YaegerGame yaegerGame;
 
@@ -540,10 +537,6 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
             slowdownBarFill.setWidth(barWidth);
             slowdownPercent.setText(String.format("%d%%", (int)(percentage * 100)));
         }
-    }
-
-        // Game ends automatically when player health reaches 0
-        // No manual exit key needed
     }
 
     @Override
