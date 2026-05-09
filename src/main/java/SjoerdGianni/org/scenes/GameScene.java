@@ -480,16 +480,17 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
      */
     @Override
     public void explicitUpdate(long timestamp) {
-        if (player != null && !player.isAlive()) {
-            gameEndTime = getTimestamp();
-            yaegerGame.setActiveScene(2);
-        }
+           if (player == null){
+                    return;
+           }
+           if (!player.isAlive()) {
+                   gameEndTime = getTimestamp();
+                  yaegerGame.setActiveScene(2);
+           }
 
         // Update powerup UI and health display
-        if (player != null) {
-            updatePowerupUI();
-            updateHealthUI();
-        }
+        updatePowerupUI();
+        updateHealthUI();
     }
 
     /**
