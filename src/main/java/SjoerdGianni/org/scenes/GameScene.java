@@ -178,7 +178,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
      * @return the survival time as a formatted string
      */
     public static String getSurvivalTime() {
-        long endTime = gameEndTime > 0 ? gameEndTime : System.currentTimeMillis();
+        long endTime = gameEndTime > 0 ? gameEndTime : getTimestamp();
         long survivalTimeMs = endTime - gameStartTime;
         long totalSeconds = survivalTimeMs / 1000;
         long minutes = totalSeconds / 60;
@@ -230,7 +230,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         bulletsFired = 0; // Reset bullets fired
         bulletsHit = 0; // Reset bullets hit
         enemiesKilled = 0; // Reset enemies killed
-        gameStartTime = System.currentTimeMillis(); // Record game start time
+        gameStartTime = getTimestamp();
         gameEndTime = 0;
         lastEnemySpawnTime = 0; // Reset spawn timer
         
@@ -485,7 +485,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     @Override
     public void explicitUpdate(long timestamp) {
         if (player != null && !player.isAlive()) {
-            gameEndTime = System.currentTimeMillis(); // Record game end time
+            gameEndTime = getTimestamp();
             yaegerGame.setActiveScene(2);
         }
 
@@ -545,8 +545,6 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         }
     }
 
-    @Override
-    public void onPressedKeysChange(Set<KeyCode> input) {
         // Game ends automatically when player health reaches 0
         // No manual exit key needed
     }
