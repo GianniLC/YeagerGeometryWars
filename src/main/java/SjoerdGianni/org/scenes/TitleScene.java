@@ -79,10 +79,9 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         addEntity(clickDifficultyHint);
 
         // EASY difficulty button
-        easyButton = new Button(new Coordinate2D(365, 310), 550, 55, "EASY");
-        easyButton.getLabel().setAnchorPoint(AnchorPoint.CENTER_LEFT);
-        easyButton.getLabel().setX(390);
-        easyButton.getLabel().setY(325);
+        easyButton = new Button(new Coordinate2D(365, 310), 550, 55, "EASY",
+                                Color.WHITE, Color.BLACK, 18, FontWeight.BOLD,
+                                AnchorPoint.CENTER_LEFT, new Coordinate2D(390, 325));
         addEntity(easyButton.getBox());
         addEntity(easyButton.getLabel());
 
@@ -93,10 +92,9 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         addEntity(easySpawnText);
 
         // MEDIUM difficulty button
-        mediumButton = new Button(new Coordinate2D(365, 375), 550, 55, "MEDIUM");
-        mediumButton.getLabel().setAnchorPoint(AnchorPoint.CENTER_LEFT);
-        mediumButton.getLabel().setX(390);
-        mediumButton.getLabel().setY(390);
+        mediumButton = new Button(new Coordinate2D(365, 375), 550, 55, "MEDIUM",
+                                  Color.WHITE, Color.BLACK, 18, FontWeight.BOLD,
+                                  AnchorPoint.CENTER_LEFT, new Coordinate2D(390, 390));
         addEntity(mediumButton.getBox());
         addEntity(mediumButton.getLabel());
 
@@ -107,10 +105,9 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         addEntity(mediumSpawnText);
 
         // HARD difficulty button
-        hardButton = new Button(new Coordinate2D(365, 440), 550, 55, "HARD");
-        hardButton.getLabel().setAnchorPoint(AnchorPoint.CENTER_LEFT);
-        hardButton.getLabel().setX(390);
-        hardButton.getLabel().setY(455);
+        hardButton = new Button(new Coordinate2D(365, 440), 550, 55, "HARD",
+                                Color.WHITE, Color.BLACK, 18, FontWeight.BOLD,
+                                AnchorPoint.CENTER_LEFT, new Coordinate2D(390, 455));
         addEntity(hardButton.getBox());
         addEntity(hardButton.getLabel());
 

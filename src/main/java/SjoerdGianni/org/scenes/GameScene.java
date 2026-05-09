@@ -68,6 +68,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
 
     // Health UI elements
     private TextEntity[] hearts = new TextEntity[3];
+    private TextEntity overflowLivesCounter;
 
     public GameScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
@@ -268,6 +269,14 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
             hearts[i].setFont(Font.font("Arial", FontWeight.BOLD, 28));
             addEntity(hearts[i]);
         }
+
+        // Overflow lives counter (for 4+ lives)
+        overflowLivesCounter = new TextEntity(new Coordinate2D(220, 28), "+0");
+        overflowLivesCounter.setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        overflowLivesCounter.setFill(Color.ORANGE);
+        overflowLivesCounter.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        overflowLivesCounter.setVisible(false);
+        addEntity(overflowLivesCounter);
 
         // Score display (top center) - no box, just white text
         var scoreLabel = new TextEntity(new Coordinate2D(640, 30), "SCORE");
@@ -494,6 +503,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
      */
     private void updateHealthUI() {
         int currentLives = player.getLives();
+        
+        // Update the 3 hearts
         for (int i = 0; i < hearts.length; i++) {
             if (i < currentLives) {
                 hearts[i].setFill(Color.RED);
@@ -502,6 +513,15 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
                 hearts[i].setFill(Color.DARKGRAY);
                 hearts[i].setOpacity(0.3);
             }
+        }
+        
+        // Update overflow counter for 4+ lives
+        if (currentLives > 3) {
+            int extraLives = currentLives - 3;
+            overflowLivesCounter.setText("+" + extraLives);
+            overflowLivesCounter.setVisible(true);
+        } else {
+            overflowLivesCounter.setVisible(false);
         }
     }
 

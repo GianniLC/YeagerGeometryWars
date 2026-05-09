@@ -45,6 +45,27 @@ public class Button {
      */
     public Button(Coordinate2D position, double width, double height, String text, 
                   Color boxColor, Color textColor, int fontSize, FontWeight fontWeight) {
+        this(position, width, height, text, boxColor, textColor, fontSize, fontWeight, 
+             AnchorPoint.CENTER_CENTER, null);
+    }
+
+    /**
+     * Create a new button with custom styling and custom label positioning.
+     * 
+     * @param position the top-left position of the button
+     * @param width the width of the button
+     * @param height the height of the button
+     * @param text the text to display on the button
+     * @param boxColor the background color of the button
+     * @param textColor the color of the text
+     * @param fontSize the font size of the text
+     * @param fontWeight the font weight of the text
+     * @param labelAnchor the anchor point for the label
+     * @param labelPosition the position for the label (null to auto-center)
+     */
+    public Button(Coordinate2D position, double width, double height, String text, 
+                  Color boxColor, Color textColor, int fontSize, FontWeight fontWeight,
+                  AnchorPoint labelAnchor, Coordinate2D labelPosition) {
         this.x = position.getX();
         this.y = position.getY();
         this.width = width;
@@ -54,11 +75,18 @@ public class Button {
         box = new LabelBox(position, width, height);
         box.setFill(boxColor);
 
-        // Create the centered label
-        double centerX = x + width / 2;
-        double centerY = y + height / 2;
-        label = new TextEntity(new Coordinate2D(centerX, centerY), text);
-        label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        // Create the label with custom or centered position
+        Coordinate2D finalLabelPosition;
+        if (labelPosition != null) {
+            finalLabelPosition = labelPosition;
+        } else {
+            double centerX = x + width / 2;
+            double centerY = y + height / 2;
+            finalLabelPosition = new Coordinate2D(centerX, centerY);
+        }
+        
+        label = new TextEntity(finalLabelPosition, text);
+        label.setAnchorPoint(labelAnchor);
         label.setFill(textColor);
         label.setFont(Font.font("Arial", fontWeight, fontSize));
     }
