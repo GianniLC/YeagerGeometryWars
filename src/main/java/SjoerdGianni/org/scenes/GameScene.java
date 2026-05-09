@@ -234,17 +234,23 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         gameEndTime = 0;
         lastEnemySpawnTime = 0; // Reset spawn timer
         
-        // Set spawn interval based on difficulty
+        // Set initial spawn interval based on difficulty
+        enemySpawnInterval = getSpawnIntervalForDifficulty();
+    }
+
+    /**
+     * Get a randomized spawn interval based on the current difficulty setting.
+     * 
+     * @return spawn interval in milliseconds
+     */
+    private long getSpawnIntervalForDifficulty() {
         switch (difficulty) {
             case "EASY":
-                enemySpawnInterval = (long) (3500 + Math.random() * 3500); // 3.5-7 seconds
-                break;
+                return (long) (3500 + Math.random() * 3500); // 3.5-7s
             case "HARD":
-                enemySpawnInterval = (long) (1500 + Math.random() * 2000); // 1.5-3.5 seconds
-                break;
+                return (long) (1500 + Math.random() * 2000); // 1.5-3.5s
             default: // MEDIUM
-                enemySpawnInterval = (long) (2000 + Math.random() * 3000); // 2-5 seconds
-                break;
+                return (long) (2000 + Math.random() * 3000); // 2-5s
         }
     }
 
@@ -373,17 +379,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
                         lastEnemySpawnTime = currentTime;
                         
                         // Randomize next spawn interval within difficulty range
-                        switch (difficulty) {
-                            case "EASY":
-                                enemySpawnInterval = (long) (3500 + Math.random() * 3500); // 3.5-7s
-                                break;
-                            case "HARD":
-                                enemySpawnInterval = (long) (1500 + Math.random() * 2000); // 1.5-3.5s
-                                break;
-                            default: // MEDIUM
-                                enemySpawnInterval = (long) (2000 + Math.random() * 3000); // 2-5s
-                                break;
-                        }
+                        enemySpawnInterval = getSpawnIntervalForDifficulty();
                     }
                 }
             }
