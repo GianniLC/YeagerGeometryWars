@@ -1,6 +1,7 @@
 package SjoerdGianni.org.entities.enemies;
 
 import SjoerdGianni.org.entities.player.Player;
+import SjoerdGianni.org.entities.powerups.NukePowerup;
 import SjoerdGianni.org.scenes.GameScene;
 import SjoerdGianni.org.shared.MathHelper;
 import com.github.hanyaeger.api.Coordinate2D;
@@ -14,7 +15,7 @@ public class ZigZagEnemy extends Enemy{
     private double movementAngle;
 
     private long lastZigZagTimestamp;
-    private int zigZagIntervalInMs;
+    private final int zigZagIntervalInMs;
 
     public ZigZagEnemy(Coordinate2D initialLocation) {
         super(initialLocation, 15, Color.YELLOW, 15, 2);
@@ -47,5 +48,11 @@ public class ZigZagEnemy extends Enemy{
 
         setMotion(movementSpeed, movementAngle);
 
+    }
+
+    @Override
+    public void onDeath(){
+        dropPowerup(NukePowerup.class, 12.5);
+        super.onDeath();
     }
 }

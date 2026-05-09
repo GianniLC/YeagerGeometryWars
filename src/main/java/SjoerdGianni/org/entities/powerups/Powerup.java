@@ -1,5 +1,6 @@
 package SjoerdGianni.org.entities.powerups;
 
+import SjoerdGianni.org.entities.player.Player;
 import com.github.hanyaeger.api.AnchorPoint;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.Collider;
@@ -23,7 +24,7 @@ public abstract class Powerup extends CircleEntity implements Collider {
      *
      * @implSpec Always call `super.applyEffect()` when overriding this method
      */
-    public void applyEffect() {
+    public void applyEffect(Player player) {
         remove();
     };
 }

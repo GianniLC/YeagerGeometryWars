@@ -1,6 +1,7 @@
 package SjoerdGianni.org.entities.powerups;
 
 import SjoerdGianni.org.entities.enemies.Enemy;
+import SjoerdGianni.org.entities.player.Player;
 import com.github.hanyaeger.api.Coordinate2D;
 import javafx.scene.paint.Color;
 
@@ -14,7 +15,7 @@ public class NukePowerup extends Powerup{
     }
 
     @Override
-    public void applyEffect() {
+    public void applyEffect(Player player) {
         // The 'nuke' effect is implemented in this non-Single-Source-Of-Truth way, because Yaeger doesn't
         // allow you to get the current list of entities in a YaegerScene.
         // The attempted solution utilizing Yaeger was finding a way to get the `updatable` list from the
@@ -27,6 +28,6 @@ public class NukePowerup extends Powerup{
         for (Enemy enemy: enemies){
             enemy.onDeath();
         }
-        super.applyEffect();
+        super.applyEffect(player);
     }
 }
