@@ -362,7 +362,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
             @Override
             protected void spawnEntities() {
                 if (!isGameOver) {
-                    long currentTime = System.currentTimeMillis();
+                    long currentTime = getTimestamp();
                     if (currentTime - lastEnemySpawnTime >= enemySpawnInterval) {
                         // Spawn 1-5 enemies at once
                         int enemyCount = (int) (1 + Math.random() * 5); // 1-5 enemies
