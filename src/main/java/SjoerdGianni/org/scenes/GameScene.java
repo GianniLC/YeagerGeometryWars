@@ -54,6 +54,9 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     private long enemySpawnInterval = 2000; // Milliseconds between spawns
     private long lastEnemySpawnTime = 0;
 
+    // Game settings
+    private static boolean friendlyFireEnabled = false; // Enemy bullets can hit enemies
+
     // Powerup UI elements - Slot 1 (Better Bullets)
     private TextEntity betterBulletsLabel;
     private LabelBox betterBulletsBarBg;
@@ -201,6 +204,24 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         return difficulty;
     }
 
+    /**
+     * Set whether friendly fire is enabled (enemy bullets can hit other enemies).
+     * 
+     * @param enabled true to enable friendly fire, false to disable
+     */
+    public static void setFriendlyFireEnabled(boolean enabled) {
+        friendlyFireEnabled = enabled;
+    }
+
+    /**
+     * Get whether friendly fire is enabled.
+     * 
+     * @return true if friendly fire is enabled, false otherwise
+     */
+    public static boolean isFriendlyFireEnabled() {
+        return friendlyFireEnabled;
+    }
+
     @Override
     public void setupScene() {
         setBackgroundColor(Color.BLACK);
@@ -343,8 +364,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
                 if (!isGameOver) {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastEnemySpawnTime >= enemySpawnInterval) {
-                        // Spawn 5-10 enemies at once
-                        int enemyCount = (int) (5 + Math.random() * 6); // 5-10 enemies
+                        // Spawn 3-7 enemies at once
+                        int enemyCount = (int) (3 + Math.random() * 5); // 3-7 enemies
                         for (int i = 0; i < enemyCount; i++) {
                             spawnRandomEnemy();
                         }

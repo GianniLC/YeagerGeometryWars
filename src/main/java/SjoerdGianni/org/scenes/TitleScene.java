@@ -18,6 +18,18 @@ import java.util.Set;
 
 public class TitleScene extends StaticScene implements KeyListener, MouseButtonPressedListener {
     private final YaegerGame yaegerGame;
+    
+    // Settings overlay entities
+    private LabelBox settingsOverlayBg;
+    private LabelBox settingsPanel;
+    private TextEntity settingsTitleText;
+    private LabelBox friendlyFireCheckbox;
+    private TextEntity friendlyFireCheckmark;
+    private TextEntity friendlyFireLabel;
+    private TextEntity friendlyFireDesc;
+    private LabelBox closeButton;
+    private TextEntity closeButtonLabel;
+    private boolean settingsVisible = false;
 
     public TitleScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
@@ -126,6 +138,69 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         backLabel.setFill(Color.BLACK);
         backLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 13));
         addEntity(backLabel);
+
+        // Settings overlay - semi-transparent background (initially hidden)
+        settingsOverlayBg = new LabelBox(new Coordinate2D(0, 0), 1280, 720);
+        settingsOverlayBg.setFill(Color.rgb(0, 0, 0, 0.7));
+        settingsOverlayBg.setOpacity(0);
+        addEntity(settingsOverlayBg);
+
+        // Settings panel
+        settingsPanel = new LabelBox(new Coordinate2D(390, 200), 500, 320);
+        settingsPanel.setOpacity(0);
+        addEntity(settingsPanel);
+
+        // Settings title
+        settingsTitleText = new TextEntity(new Coordinate2D(640, 240), "SETTINGS");
+        settingsTitleText.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        settingsTitleText.setFill(Color.BLACK);
+        settingsTitleText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        settingsTitleText.setOpacity(0);
+        addEntity(settingsTitleText);
+
+        // Friendly Fire checkbox (25x25 box)
+        friendlyFireCheckbox = new LabelBox(new Coordinate2D(420, 310), 25, 25);
+        friendlyFireCheckbox.setFill(Color.WHITE);
+        friendlyFireCheckbox.setStrokeColor(Color.BLACK);
+        friendlyFireCheckbox.setStrokeWidth(2);
+        friendlyFireCheckbox.setOpacity(0);
+        addEntity(friendlyFireCheckbox);
+
+        // Checkmark (initially hidden based on setting)
+        friendlyFireCheckmark = new TextEntity(new Coordinate2D(432.5, 322.5), "✓");
+        friendlyFireCheckmark.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        friendlyFireCheckmark.setFill(Color.BLACK);
+        friendlyFireCheckmark.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        friendlyFireCheckmark.setOpacity(0);
+        addEntity(friendlyFireCheckmark);
+
+        // Friendly Fire label
+        friendlyFireLabel = new TextEntity(new Coordinate2D(460, 322.5), "Enable Friendly Fire");
+        friendlyFireLabel.setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        friendlyFireLabel.setFill(Color.BLACK);
+        friendlyFireLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
+        friendlyFireLabel.setOpacity(0);
+        addEntity(friendlyFireLabel);
+
+        // Friendly Fire description
+        friendlyFireDesc = new TextEntity(new Coordinate2D(460, 345), "Green enemy bullets can hit other enemies");
+        friendlyFireDesc.setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        friendlyFireDesc.setFill(Color.GRAY);
+        friendlyFireDesc.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        friendlyFireDesc.setOpacity(0);
+        addEntity(friendlyFireDesc);
+
+        // Close button
+        closeButton = new LabelBox(new Coordinate2D(565, 450), 150, 50);
+        closeButton.setOpacity(0);
+        addEntity(closeButton);
+
+        closeButtonLabel = new TextEntity(new Coordinate2D(640, 475), "CLOSE");
+        closeButtonLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        closeButtonLabel.setFill(Color.BLACK);
+        closeButtonLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        closeButtonLabel.setOpacity(0);
+        addEntity(closeButtonLabel);
     }
 
     @Override
@@ -137,6 +212,19 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
     public void onMouseButtonPressed(MouseButton button, Coordinate2D coordinate2D) {
         double x = coordinate2D.getX();
         double y = coordinate2D.getY();
+
+        // If settings overlay is visible, handle settings interactions
+        if (settingsVisible) {
+            // Check if clicked on friendly fire checkbox (x: 420-445, y: 310-335)
+            if (x >= 420 && x <= 445 && y >= 310 && y <= 335) {
+                toggleFriendlyFire();
+            }
+            // Check if clicked on CLOSE button (x: 565-715, y: 450-500)
+            else if (x >= 565 && x <= 715 && y >= 450 && y <= 500) {
+                hideSettings();
+            }
+            return; // Don't process other clicks while settings are open
+        }
 
         // Check if clicked on EASY (y: 310-365, x: 365-915)
         if (x >= 365 && x <= 915 && y >= 310 && y <= 365) {
@@ -152,6 +240,56 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         else if (x >= 365 && x <= 915 && y >= 440 && y <= 495) {
             GameScene.setDifficulty("HARD");
             yaegerGame.setActiveScene(1);
+        }
+        // Check if clicked on SETTINGS button (x: 365-485, y: 540-580)
+        else if (x >= 365 && x <= 485 && y >= 540 && y <= 580) {
+            showSettings();
+        }
+        // Check if clicked on BACK TO DESKTOP button (x: 795-915, y: 540-580)
+        else if (x >= 795 && x <= 915 && y >= 540 && y <= 580) {
+            yaegerGame.quit();
+        }
+    }
+
+    private void showSettings() {
+        settingsVisible = true;
+        settingsOverlayBg.setOpacity(1);
+        settingsPanel.setOpacity(1);
+        settingsTitleText.setOpacity(1);
+        friendlyFireCheckbox.setOpacity(1);
+        friendlyFireLabel.setOpacity(1);
+        friendlyFireDesc.setOpacity(1);
+        closeButton.setOpacity(1);
+        closeButtonLabel.setOpacity(1);
+        
+        // Update checkmark visibility based on current setting
+        updateCheckmark();
+    }
+
+    private void hideSettings() {
+        settingsVisible = false;
+        settingsOverlayBg.setOpacity(0);
+        settingsPanel.setOpacity(0);
+        settingsTitleText.setOpacity(0);
+        friendlyFireCheckbox.setOpacity(0);
+        friendlyFireCheckmark.setOpacity(0);
+        friendlyFireLabel.setOpacity(0);
+        friendlyFireDesc.setOpacity(0);
+        closeButton.setOpacity(0);
+        closeButtonLabel.setOpacity(0);
+    }
+
+    private void toggleFriendlyFire() {
+        boolean current = GameScene.isFriendlyFireEnabled();
+        GameScene.setFriendlyFireEnabled(!current);
+        updateCheckmark();
+    }
+
+    private void updateCheckmark() {
+        if (GameScene.isFriendlyFireEnabled()) {
+            friendlyFireCheckmark.setOpacity(1);
+        } else {
+            friendlyFireCheckmark.setOpacity(0);
         }
     }
 }

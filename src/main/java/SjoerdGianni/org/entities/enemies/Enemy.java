@@ -91,7 +91,11 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
     private void onHitByBullet(Bullet bullet) {
         bullet.remove();
         applyDamage(bullet.getDamagePoints());
-        GameScene.incrementBulletsHit();
+        
+        // Only count player bullets for accuracy tracking
+        if (bullet.getTargetType() == Enemy.class) {
+            GameScene.incrementBulletsHit();
+        }
     }
 
     @Override
@@ -99,7 +103,12 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
         for (Collider collider : collidingObjects) {
             if (collider instanceof Bullet) {
                 Bullet bullet = (Bullet) collider;
+                // Check if bullet targets Enemy class
                 if (bullet.getTargetType() == Enemy.class) {
+                    onHitByBullet(bullet);
+                }
+                // Check if bullet targets Player class but friendly fire is enabled
+                else if (bullet.getTargetType() == Player.class && GameScene.isFriendlyFireEnabled()) {
                     onHitByBullet(bullet);
                 }
             }

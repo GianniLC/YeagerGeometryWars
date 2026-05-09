@@ -84,15 +84,15 @@ public class EndScene extends StaticScene implements KeyListener, MouseButtonPre
         restartLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         addEntity(restartLabel);
 
-        // QUIT button - white box
-        var quitBox = new LabelBox(new Coordinate2D(675, 400), 130, 60);
-        addEntity(quitBox);
+        // MENU button - white box
+        var menuBox = new LabelBox(new Coordinate2D(675, 400), 130, 60);
+        addEntity(menuBox);
         
-        var quitLabel = new TextEntity(new Coordinate2D(740, 430), "QUIT");
-        quitLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        quitLabel.setFill(Color.BLACK);
-        quitLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(quitLabel);
+        var menuLabel = new TextEntity(new Coordinate2D(740, 430), "MENU");
+        menuLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        menuLabel.setFill(Color.BLACK);
+        menuLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        addEntity(menuLabel);
 
         // Game Statistics section
         var statsTitle = new TextEntity(new Coordinate2D(640, 500), "GAME STATISTICS");
@@ -174,8 +174,8 @@ public class EndScene extends StaticScene implements KeyListener, MouseButtonPre
     public void onPressedKeysChange(Set<KeyCode> input) {
         if (input.contains(KeyCode.R)) {
             yaegerGame.setActiveScene(1); // Restart game
-        } else if (input.contains(KeyCode.Q) || input.contains(KeyCode.ESCAPE)) {
-            yaegerGame.quit(); // Close the game
+        } else if (input.contains(KeyCode.M) || input.contains(KeyCode.SPACE)) {
+            yaegerGame.setActiveScene(0); // Return to menu
         }
     }
 
@@ -188,9 +188,9 @@ public class EndScene extends StaticScene implements KeyListener, MouseButtonPre
         if (x >= 475 && x <= 605 && y >= 400 && y <= 460) {
             yaegerGame.setActiveScene(1); // Restart game
         }
-        // Check if clicked on QUIT button (x: 675-805, y: 400-460)
+        // Check if clicked on MENU button (x: 675-805, y: 400-460)
         else if (x >= 675 && x <= 805 && y >= 400 && y <= 460) {
-            yaegerGame.quit(); // Close the game
+            yaegerGame.setActiveScene(0); // Return to menu
         }
     }
 }
