@@ -91,6 +91,11 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
     private void onHitByBullet(Bullet bullet) {
         bullet.remove();
         applyDamage(bullet.getDamagePoints());
+        
+        // Only count player bullets for accuracy tracking
+        if (bullet.getTargetType() == Enemy.class) {
+            GameScene.incrementBulletsHit();
+        }
     }
 
     @Override
@@ -98,7 +103,12 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
         for (Collider collider : collidingObjects) {
             if (collider instanceof Bullet) {
                 Bullet bullet = (Bullet) collider;
+                // Check if bullet targets Enemy class
                 if (bullet.getTargetType() == Enemy.class) {
+                    onHitByBullet(bullet);
+                }
+                // Check if bullet targets Player class but friendly fire is enabled
+                else if (bullet.getTargetType() == Player.class && GameScene.isFriendlyFireEnabled()) {
                     onHitByBullet(bullet);
                 }
             }
@@ -134,11 +144,18 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
      * @implSpec Always call `super.onDeath()` when overriding this method
      */
     public void onDeath() {
-        // For future implementation:
-        // - Increase score of scoreboard
-        // - (Through @Override in a child class) Chance of dropping a specific powerup
+        // Add score when enemy dies
+        GameScene.addScore(getPointValue());
+        GameScene.incrementEnemiesKilled();
         remove();
     }
+
+    /**
+     * Get the point value awarded when this enemy is killed.
+     * 
+     * @return the number of points this enemy is worth
+     */
+    public abstract int getPointValue();
 
     @Override
     public void remove() {

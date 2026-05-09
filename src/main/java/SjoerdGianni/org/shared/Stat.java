@@ -39,4 +39,29 @@ public class Stat<T> {
             value = baseValue;
         }
     }
+
+    /**
+     * Check if a temporary effect is currently active
+     * @return true if the stat has a temporary value applied, false otherwise
+     */
+    public boolean isActive(){
+        return value != baseValue;
+    }
+
+    /**
+     * Get the remaining duration percentage of the temporary effect
+     * @param currentTimestamp current time as a timestamp
+     * @param totalDuration total duration of the effect in milliseconds
+     * @return percentage from 0.0 to 1.0 representing remaining time
+     */
+    public double getRemainingPercentage(long currentTimestamp, long totalDuration){
+        if (!isActive() || totalDuration <= 0){
+            return 0.0;
+        }
+        long remainingTime = resetTimestamp - currentTimestamp;
+        if (remainingTime <= 0){
+            return 0.0;
+        }
+        return Math.min(1.0, (double)remainingTime / totalDuration);
+    }
 }

@@ -3,19 +3,26 @@ package SjoerdGianni.org.scenes;
 import com.github.hanyaeger.api.YaegerGame;
 import com.github.hanyaeger.api.scenes.StaticScene;
 import com.github.hanyaeger.api.AnchorPoint;
+import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.userinput.KeyListener;
+import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import com.github.hanyaeger.api.Coordinate2D;
+import SjoerdGianni.org.entities.Button;
 import SjoerdGianni.org.entities.LabelBox;
 
 import java.util.Set;
 
-public class EndScene extends StaticScene implements KeyListener {
+public class EndScene extends StaticScene implements KeyListener, MouseButtonPressedListener {
     private final YaegerGame yaegerGame;
+    
+    // Buttons
+    private Button restartButton;
+    private Button menuButton;
 
     public EndScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
@@ -49,7 +56,7 @@ public class EndScene extends StaticScene implements KeyListener {
         addEntity(finalScoreLabel);
 
         // Score value - display directly on black background (no box)
-        var scoreValue = new TextEntity(new Coordinate2D(640, 270), "1,234");
+        var scoreValue = new TextEntity(new Coordinate2D(640, 270), String.valueOf(GameScene.getScore()));
         scoreValue.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         scoreValue.setFill(Color.WHITE);
         scoreValue.setFont(Font.font("Arial", FontWeight.BOLD, 32));
@@ -66,43 +73,21 @@ public class EndScene extends StaticScene implements KeyListener {
         addEntity(difficultyLabel);
 
         // Difficulty value - display directly on black background
-        var difficultyValue = new TextEntity(new Coordinate2D(640, 352), "MEDIUM");
+        var difficultyValue = new TextEntity(new Coordinate2D(640, 352), GameScene.getDifficulty());
         difficultyValue.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         difficultyValue.setFill(Color.WHITE);
         difficultyValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         addEntity(difficultyValue);
 
-        // RESTART button - white box
-        var restartBox = new LabelBox(new Coordinate2D(475, 400), 130, 60);
-        addEntity(restartBox);
-        
-        var restartLabel = new TextEntity(new Coordinate2D(540, 422), "RESTART");
-        restartLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        restartLabel.setFill(Color.BLACK);
-        restartLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(restartLabel);
+        // RESTART button
+        restartButton = new Button(new Coordinate2D(475, 400), 130, 60, "RESTART");
+        addEntity(restartButton.getBox());
+        addEntity(restartButton.getLabel());
 
-        var restartHint = new TextEntity(new Coordinate2D(540, 445), "Press R");
-        restartHint.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        restartHint.setFill(Color.DARKGRAY);
-        restartHint.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(restartHint);
-
-        // MENU button - white box
-        var menuBox = new LabelBox(new Coordinate2D(675, 400), 130, 60);
-        addEntity(menuBox);
-        
-        var menuLabel = new TextEntity(new Coordinate2D(740, 422), "MENU");
-        menuLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        menuLabel.setFill(Color.BLACK);
-        menuLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(menuLabel);
-
-        var menuHint = new TextEntity(new Coordinate2D(740, 445), "Press M");
-        menuHint.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        menuHint.setFill(Color.DARKGRAY);
-        menuHint.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(menuHint);
+        // MENU button
+        menuButton = new Button(new Coordinate2D(675, 400), 130, 60, "MENU");
+        addEntity(menuButton.getBox());
+        addEntity(menuButton.getLabel());
 
         // Game Statistics section
         var statsTitle = new TextEntity(new Coordinate2D(640, 500), "GAME STATISTICS");
@@ -125,7 +110,7 @@ public class EndScene extends StaticScene implements KeyListener {
         enemiesKilledLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(enemiesKilledLabel);
 
-        var enemiesKilledValue = new TextEntity(new Coordinate2D(365, 580), "[123]");
+        var enemiesKilledValue = new TextEntity(new Coordinate2D(365, 580), String.valueOf(GameScene.getEnemiesKilled()));
         enemiesKilledValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         enemiesKilledValue.setFill(Color.BLACK);
         enemiesKilledValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -141,7 +126,7 @@ public class EndScene extends StaticScene implements KeyListener {
         timeSurvivedLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(timeSurvivedLabel);
 
-        var timeSurvivedValue = new TextEntity(new Coordinate2D(745, 580), "[2:34]");
+        var timeSurvivedValue = new TextEntity(new Coordinate2D(745, 580), GameScene.getSurvivalTime());
         timeSurvivedValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         timeSurvivedValue.setFill(Color.BLACK);
         timeSurvivedValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -157,7 +142,7 @@ public class EndScene extends StaticScene implements KeyListener {
         powerupsUsedLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(powerupsUsedLabel);
 
-        var powerupsUsedValue = new TextEntity(new Coordinate2D(365, 660), "[5]");
+        var powerupsUsedValue = new TextEntity(new Coordinate2D(365, 660), String.valueOf(GameScene.getPowerupsUsed()));
         powerupsUsedValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         powerupsUsedValue.setFill(Color.BLACK);
         powerupsUsedValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -173,7 +158,7 @@ public class EndScene extends StaticScene implements KeyListener {
         accuracyLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(accuracyLabel);
 
-        var accuracyValue = new TextEntity(new Coordinate2D(745, 660), "[45%]");
+        var accuracyValue = new TextEntity(new Coordinate2D(745, 660), GameScene.getAccuracy());
         accuracyValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         accuracyValue.setFill(Color.BLACK);
         accuracyValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -182,8 +167,25 @@ public class EndScene extends StaticScene implements KeyListener {
 
     @Override
     public void onPressedKeysChange(Set<KeyCode> input) {
-        if (input.contains(KeyCode.SPACE)) {
-            yaegerGame.setActiveScene(0);
+        if (input.contains(KeyCode.R)) {
+            yaegerGame.setActiveScene(1); // Restart game
+        } else if (input.contains(KeyCode.M) || input.contains(KeyCode.SPACE)) {
+            yaegerGame.setActiveScene(0); // Return to menu
+        }
+    }
+
+    @Override
+    public void onMouseButtonPressed(MouseButton button, Coordinate2D coordinate2D) {
+        double x = coordinate2D.getX();
+        double y = coordinate2D.getY();
+
+        // Check if clicked on RESTART button
+        if (restartButton.contains(x, y)) {
+            yaegerGame.setActiveScene(1); // Restart game
+        }
+        // Check if clicked on MENU button
+        else if (menuButton.contains(x, y)) {
+            yaegerGame.setActiveScene(0); // Return to menu
         }
     }
 }

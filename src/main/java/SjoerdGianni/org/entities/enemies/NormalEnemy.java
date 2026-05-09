@@ -14,4 +14,9 @@ public class NormalEnemy extends Enemy{
         dropPowerup(SlowdownPowerup.class, 100);
         super.onDeath();
     }
+
+    @Override
+    public int getPointValue() {
+        return 1;
+    }
 }

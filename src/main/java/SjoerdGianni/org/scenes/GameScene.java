@@ -2,6 +2,8 @@ package SjoerdGianni.org.scenes;
 
 import SjoerdGianni.org.entities.LabelBox;
 import SjoerdGianni.org.entities.bullets.Bullet;
+import SjoerdGianni.org.entities.enemies.BossEnemy;
+import SjoerdGianni.org.entities.enemies.Enemy;
 import SjoerdGianni.org.entities.enemies.NormalEnemy;
 import SjoerdGianni.org.entities.enemies.SpikeEnemy;
 import SjoerdGianni.org.entities.enemies.ZigZagEnemy;
@@ -11,20 +13,17 @@ import com.github.hanyaeger.api.*;
 import com.github.hanyaeger.api.entities.EntitySpawner;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.scenes.DynamicScene;
-import com.github.hanyaeger.api.userinput.KeyListener;
 import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
 import com.github.hanyaeger.api.userinput.MouseButtonReleasedListener;
 import com.github.hanyaeger.api.userinput.MouseMovedWhileDraggingListener;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import java.util.ArrayList;
-import java.util.Set;
 
-public class GameScene extends DynamicScene implements EntitySpawnerContainer, KeyListener, MouseButtonPressedListener,
+public class GameScene extends DynamicScene implements EntitySpawnerContainer, MouseButtonPressedListener,
         MouseButtonReleasedListener, MouseMovedWhileDraggingListener, UpdateExposer {
     private final YaegerGame yaegerGame;
 
@@ -32,6 +31,44 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     private static final ArrayList<Bullet> bulletsToSpawn = new ArrayList<Bullet>();
     private static final ArrayList<Powerup> powerupsToSpawn = new ArrayList<Powerup>();
     private boolean isGameOver = false;
+    
+    private static int score = 0;
+    private static TextEntity scoreValueText;
+    
+    private static int powerupsUsed = 0;
+
+    // Accuracy tracking
+    private static int bulletsFired = 0;
+    private static int bulletsHit = 0;
+
+    // Game statistics
+    private static int enemiesKilled = 0;
+    private static long gameStartTime = 0;
+    private static long gameEndTime = 0;
+
+    // Difficulty settings
+    private static String difficulty = "MEDIUM"; // Default
+    private long enemySpawnInterval = 2000; // Milliseconds between spawns
+    private long lastEnemySpawnTime = 0;
+
+    // Game settings
+    private static boolean friendlyFireEnabled = false; // Enemy bullets can hit enemies
+
+    // Powerup UI elements - Slot 1 (Better Bullets)
+    private TextEntity betterBulletsLabel;
+    private LabelBox betterBulletsBarBg;
+    private LabelBox betterBulletsBarFill;
+    private TextEntity betterBulletsPercent;
+
+    // Powerup UI elements - Slot 2 (Slowdown)
+    private TextEntity slowdownLabel;
+    private LabelBox slowdownBarBg;
+    private LabelBox slowdownBarFill;
+    private TextEntity slowdownPercent;
+
+    // Health UI elements
+    private TextEntity[] hearts = new TextEntity[3];
+    private TextEntity overflowLivesCounter;
 
     public GameScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
@@ -53,9 +90,166 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         return System.currentTimeMillis();
     }
 
+    /**
+     * Add points to the player's score and update the score display.
+     * 
+     * @param points the number of points to add
+     */
+    public static void addScore(int points) {
+        score += points;
+        if (scoreValueText != null) {
+            scoreValueText.setText(String.format("%04d", score));
+        }
+    }
+
+    /**
+     * Get the current score.
+     * 
+     * @return the current score
+     */
+    public static int getScore() {
+        return score;
+    }
+
+    /**
+     * Increment the powerup usage counter.
+     */
+    public static void incrementPowerupsUsed() {
+        powerupsUsed++;
+    }
+
+    /**
+     * Get the total number of powerups used.
+     * 
+     * @return the number of powerups used
+     */
+    public static int getPowerupsUsed() {
+        return powerupsUsed;
+    }
+
+    /**
+     * Increment the bullets fired counter.
+     */
+    public static void incrementBulletsFired() {
+        bulletsFired++;
+    }
+
+    /**
+     * Increment the bullets hit counter.
+     */
+    public static void incrementBulletsHit() {
+        bulletsHit++;
+    }
+
+    /**
+     * Calculate the accuracy percentage.
+     * 
+     * @return the accuracy as a percentage string (e.g., "69%"), or "0%" if no bullets fired
+     */
+    public static String getAccuracy() {
+        if (bulletsFired == 0) {
+            return "0%";
+        }
+        int accuracyPercent = (int) Math.round((double) bulletsHit / bulletsFired * 100);
+        return accuracyPercent + "%";
+    }
+
+    /**
+     * Increment the enemies killed counter.
+     */
+    public static void incrementEnemiesKilled() {
+        enemiesKilled++;
+    }
+
+    /**
+     * Get the total number of enemies killed.
+     * 
+     * @return the number of enemies killed
+     */
+    public static int getEnemiesKilled() {
+        return enemiesKilled;
+    }
+
+    /**
+     * Get the survival time formatted as MM:SS.
+     * 
+     * @return the survival time as a formatted string
+     */
+    public static String getSurvivalTime() {
+        long endTime = gameEndTime > 0 ? gameEndTime : getTimestamp();
+        long survivalTimeMs = endTime - gameStartTime;
+        long totalSeconds = survivalTimeMs / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        return String.format("%d:%02d", minutes, seconds);
+    }
+
+    /**
+     * Set the game difficulty which affects enemy spawn rates.
+     * 
+     * @param diff the difficulty level ("EASY", "MEDIUM", or "HARD")
+     */
+    public static void setDifficulty(String diff) {
+        difficulty = diff;
+    }
+
+    /**
+     * Get the current difficulty setting.
+     * 
+     * @return the current difficulty level
+     */
+    public static String getDifficulty() {
+        return difficulty;
+    }
+
+    /**
+     * Set whether friendly fire is enabled (enemy bullets can hit other enemies).
+     * 
+     * @param enabled true to enable friendly fire, false to disable
+     */
+    public static void setFriendlyFireEnabled(boolean enabled) {
+        friendlyFireEnabled = enabled;
+    }
+
+    /**
+     * Get whether friendly fire is enabled.
+     * 
+     * @return true if friendly fire is enabled, false otherwise
+     */
+    public static boolean isFriendlyFireEnabled() {
+        return friendlyFireEnabled;
+    }
+
     @Override
     public void setupScene() {
         setBackgroundColor(Color.BLACK);
+        score = 0; // Reset score when starting a new game
+        powerupsUsed = 0; // Reset powerup count when starting a new game
+        bulletsFired = 0; // Reset bullets fired
+        bulletsHit = 0; // Reset bullets hit
+        enemiesKilled = 0; // Reset enemies killed
+        gameStartTime = getTimestamp();
+        gameEndTime = 0;
+        lastEnemySpawnTime = 0; // Reset spawn timer
+        
+        // Set initial spawn interval based on difficulty
+        enemySpawnInterval = getSpawnIntervalForDifficulty();
+    }
+
+    /**
+     * Get a randomized spawn interval based on the current difficulty setting.
+     * 
+     * @return spawn interval in milliseconds
+     */
+    private long getSpawnIntervalForDifficulty() {
+        switch (difficulty) {
+            case "EASY":
+                return (long) (3500 + Math.random() * 3500); // 3.5-7s
+            case "HARD":
+                return (long) (1500 + Math.random() * 2000); // 1.5-3.5s
+            default: // MEDIUM
+                return (long) (2000 + Math.random() * 3000); // 2-5s
+        }
     }
 
     @Override
@@ -69,12 +263,20 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
 
         // Health indicator hearts - no boxes, just hearts
         for (int i = 0; i < 3; i++) {
-            var heart = new TextEntity(new Coordinate2D(115 + (i * 35), 28), "♥");
-            heart.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-            heart.setFill(Color.RED);
-            heart.setFont(Font.font("Arial", FontWeight.BOLD, 28));
-            addEntity(heart);
+            hearts[i] = new TextEntity(new Coordinate2D(115 + (i * 35), 28), "♥");
+            hearts[i].setAnchorPoint(AnchorPoint.CENTER_CENTER);
+            hearts[i].setFill(Color.RED);
+            hearts[i].setFont(Font.font("Arial", FontWeight.BOLD, 28));
+            addEntity(hearts[i]);
         }
+
+        // Overflow lives counter (for 4+ lives)
+        overflowLivesCounter = new TextEntity(new Coordinate2D(220, 28), "+0");
+        overflowLivesCounter.setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        overflowLivesCounter.setFill(Color.ORANGE);
+        overflowLivesCounter.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        overflowLivesCounter.setVisible(false);
+        addEntity(overflowLivesCounter);
 
         // Score display (top center) - no box, just white text
         var scoreLabel = new TextEntity(new Coordinate2D(640, 30), "SCORE");
@@ -83,44 +285,59 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         scoreLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         addEntity(scoreLabel);
         
-        var scoreValue = new TextEntity(new Coordinate2D(640, 60), "0000");
-        scoreValue.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        scoreValue.setFill(Color.WHITE);
-        scoreValue.setFont(Font.font("Arial", FontWeight.BOLD, 32));
-        addEntity(scoreValue);
+        scoreValueText = new TextEntity(new Coordinate2D(640, 60), "0000");
+        scoreValueText.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        scoreValueText.setFill(Color.WHITE);
+        scoreValueText.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+        addEntity(scoreValueText);
 
-        // Compact power-up indicators (top right) - minimal design
-        // Triple Shot - small text and bar
-        var tripleShotLabel = new TextEntity(new Coordinate2D(1200, 30), "TRIPLE SHOT");
-        tripleShotLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        tripleShotLabel.setFill(Color.CYAN);
-        tripleShotLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        addEntity(tripleShotLabel);
+        // Powerup Slot 1 - Better Bullets (initially hidden)
+        betterBulletsLabel = new TextEntity(new Coordinate2D(1200, 30), "BETTER BULLETS");
+        betterBulletsLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        betterBulletsLabel.setFill(Color.YELLOW);
+        betterBulletsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        betterBulletsLabel.setVisible(false);
+        addEntity(betterBulletsLabel);
 
-        // Compact progress bar (cyan/blue)
-        var progressBarBg = new LabelBox(new Coordinate2D(1140, 45), 120, 8);
-        addEntity(progressBarBg);
+        betterBulletsBarBg = new LabelBox(new Coordinate2D(1140, 45), 120, 8);
+        betterBulletsBarBg.setVisible(false);
+        addEntity(betterBulletsBarBg);
 
-        // Progress bar fill in cyan
-        var progressBarFill = new LabelBox(new Coordinate2D(1140, 45), 90, 8); // 75% filled
-        addEntity(progressBarFill);
+        betterBulletsBarFill = new LabelBox(new Coordinate2D(1140, 45), 120, 8);
+        betterBulletsBarFill.setFill(Color.YELLOW);
+        betterBulletsBarFill.setVisible(false);
+        addEntity(betterBulletsBarFill);
 
-        var tripleShotTime = new TextEntity(new Coordinate2D(1200, 65), "75%");
-        tripleShotTime.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        tripleShotTime.setFill(Color.DARKGRAY);
-        tripleShotTime.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
-        addEntity(tripleShotTime);
+        betterBulletsPercent = new TextEntity(new Coordinate2D(1200, 65), "100%");
+        betterBulletsPercent.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        betterBulletsPercent.setFill(Color.DARKGRAY);
+        betterBulletsPercent.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        betterBulletsPercent.setVisible(false);
+        addEntity(betterBulletsPercent);
 
-        // Second power-up slot - compact version
-        var powerupSlotLabel = new TextEntity(new Coordinate2D(1200, 90), "[Power-up]");
-        powerupSlotLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        powerupSlotLabel.setFill(Color.DARKGRAY);
-        powerupSlotLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 11));
-        addEntity(powerupSlotLabel);
+        // Powerup Slot 2 - Slowdown (initially hidden)
+        slowdownLabel = new TextEntity(new Coordinate2D(1200, 90), "SLOWDOWN");
+        slowdownLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        slowdownLabel.setFill(Color.MEDIUMVIOLETRED);
+        slowdownLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        slowdownLabel.setVisible(false);
+        addEntity(slowdownLabel);
 
-        // Small bar placeholder for second power-up
-        var powerupBar = new LabelBox(new Coordinate2D(1140, 100), 120, 8);
-        addEntity(powerupBar);
+        slowdownBarBg = new LabelBox(new Coordinate2D(1140, 105), 120, 8);
+        slowdownBarBg.setVisible(false);
+        addEntity(slowdownBarBg);
+
+        slowdownBarFill = new LabelBox(new Coordinate2D(1140, 105), 120, 8);
+        slowdownBarFill.setFill(Color.MEDIUMVIOLETRED);
+        slowdownBarFill.setVisible(false);
+        addEntity(slowdownBarFill);
+
+        slowdownPercent = new TextEntity(new Coordinate2D(1200, 125), "100%");
+        slowdownPercent.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        slowdownPercent.setFill(Color.DARKGRAY);
+        slowdownPercent.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        slowdownPercent.setVisible(false);
+        addEntity(slowdownPercent);
 
         // Controls text (bottom right - no box, light gray)
         var controlsTitle = new TextEntity(new Coordinate2D(1150, 655), "WASD - Move");
@@ -139,40 +356,6 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         player = new Player(new Coordinate2D(getWidth() / 2, getHeight() / 2));
         player.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         addEntity(player);
-
-        var playerLabel = new TextEntity(new Coordinate2D(660, 410), "[player]");
-        playerLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        playerLabel.setFill(Color.WHITE);
-        playerLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(playerLabel);
-
-        // Enemies on the right side
-        var normalEnemy = new NormalEnemy(new Coordinate2D(1000, 200));
-        addEntity(normalEnemy);
-
-        var enemy1Label = new TextEntity(new Coordinate2D(1015, 250), "[enemy1]");
-        enemy1Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        enemy1Label.setFill(Color.WHITE);
-        enemy1Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(enemy1Label);
-
-        var zigZagEnemy = new ZigZagEnemy(new Coordinate2D(1015, 360));
-        addEntity(zigZagEnemy);
-
-        var enemy2Label = new TextEntity(new Coordinate2D(1015, 410), "[enemy2]");
-        enemy2Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        enemy2Label.setFill(Color.WHITE);
-        enemy2Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(enemy2Label);
-
-        var spikeEnemy = new SpikeEnemy(new Coordinate2D(1015, 510));
-        addEntity(spikeEnemy);
-
-        var enemy3Label = new TextEntity(new Coordinate2D(1015, 560), "[enemy3]");
-        enemy3Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        enemy3Label.setFill(Color.WHITE);
-        enemy3Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(enemy3Label);
     }
 
     @Override
@@ -186,16 +369,28 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
             }
         });
 
-        // // Enemy spawner
-        // addEntitySpawner(new EntitySpawner(enemySpawnInterval) {
-        // @Override
-        // protected void spawnEntities() {
-        // if (!isGameOver) {
-        // spawnRandomEnemy();
-        // }
-        // }
-        // });
-        //
+        // Enemy spawner with difficulty-based intervals
+        addEntitySpawner(new EntitySpawner(100) {
+            @Override
+            protected void spawnEntities() {
+                if (!isGameOver) {
+                    long currentTime = getTimestamp();
+                    if (currentTime - lastEnemySpawnTime >= enemySpawnInterval) {
+                        // Spawn 1-5 enemies at once
+                        int enemyCount = (int) (1 + Math.random() * 5); // 1-5 enemies
+                        for (int i = 0; i < enemyCount; i++) {
+                            spawnRandomEnemy();
+                        }
+                        
+                        lastEnemySpawnTime = currentTime;
+                        
+                        // Randomize next spawn interval within difficulty range
+                        enemySpawnInterval = getSpawnIntervalForDifficulty();
+                    }
+                }
+            }
+        });
+
         // PowerUp spawner
         addEntitySpawner(new EntitySpawner(50) {
             @Override
@@ -231,19 +426,135 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     }
 
     /**
+     * Spawn a random enemy at a random edge location using weighted probabilities.
+     * Weights ensure common enemies spawn more frequently than rare ones.
+     */
+    private void spawnRandomEnemy() {
+        // Generate random spawn position at screen edges
+        Coordinate2D spawnLocation = getRandomEdgePosition();
+        
+        // Weighted enemy spawning
+        // NormalEnemy: 50% chance (0-49)
+        // ZigZagEnemy: 25% chance (50-74)
+        // SpikeEnemy: 20% chance (75-94)
+        // BossEnemy: 5% chance (95-99)
+        
+        double random = Math.random() * 100;
+        Enemy enemy;
+        
+        if (random < 50) {
+            enemy = new NormalEnemy(spawnLocation);
+        } else if (random < 75) {
+            enemy = new ZigZagEnemy(spawnLocation);
+        } else if (random < 95){
+            enemy = new SpikeEnemy(spawnLocation);
+        }
+        else {
+             enemy = new BossEnemy(spawnLocation);
+         }
+        
+        addEntity(enemy);
+    }
+
+    /**
+     * Get a random position along the edges of the screen.
+     * 
+     * @return a coordinate at a random edge position
+     */
+    private Coordinate2D getRandomEdgePosition() {
+        double screenWidth = getWidth();
+        double screenHeight = getHeight();
+        
+        // Choose random edge: 0=top, 1=right, 2=bottom, 3=left
+        int edge = (int) (Math.random() * 4);
+        
+        switch (edge) {
+            case 0: // Top
+                return new Coordinate2D(Math.random() * screenWidth, 0);
+            case 1: // Right
+                return new Coordinate2D(screenWidth, Math.random() * screenHeight);
+            case 2: // Bottom
+                return new Coordinate2D(Math.random() * screenWidth, screenHeight);
+            default: // Left
+                return new Coordinate2D(0, Math.random() * screenHeight);
+        }
+    }
+
+    /**
      * Main game update loop. Fires on every frame.
      */
     @Override
     public void explicitUpdate(long timestamp) {
-        if (player != null && !player.isAlive()) {
-            yaegerGame.setActiveScene(2);
+           if (player == null){
+                    return;
+           }
+           if (!player.isAlive()) {
+                   gameEndTime = getTimestamp();
+                  yaegerGame.setActiveScene(2);
+           }
+
+        // Update powerup UI and health display
+        updatePowerupUI();
+        updateHealthUI();
+    }
+
+    /**
+     * Update the health hearts display based on current player lives
+     */
+    private void updateHealthUI() {
+        int currentLives = player.getLives();
+        
+        // Update the 3 hearts
+        for (int i = 0; i < hearts.length; i++) {
+            if (i < currentLives) {
+                hearts[i].setFill(Color.RED);
+                hearts[i].setOpacity(1.0);
+            } else {
+                hearts[i].setFill(Color.DARKGRAY);
+                hearts[i].setOpacity(0.3);
+            }
+        }
+        
+        // Update overflow counter for 4+ lives
+        if (currentLives > 3) {
+            int extraLives = currentLives - 3;
+            overflowLivesCounter.setText("+" + extraLives);
+            overflowLivesCounter.setVisible(true);
+        } else {
+            overflowLivesCounter.setVisible(false);
         }
     }
 
-    @Override
-    public void onPressedKeysChange(Set<KeyCode> input) {
-        if (input.contains(KeyCode.SPACE)) {
-            yaegerGame.setActiveScene(2);
+    /**
+     * Update the powerup UI display based on active powerups
+     */
+    private void updatePowerupUI() {
+        // Better Bullets powerup
+        boolean betterBulletsActive = player.isBetterBulletsActive();
+        betterBulletsLabel.setVisible(betterBulletsActive);
+        betterBulletsBarBg.setVisible(betterBulletsActive);
+        betterBulletsBarFill.setVisible(betterBulletsActive);
+        betterBulletsPercent.setVisible(betterBulletsActive);
+
+        if (betterBulletsActive) {
+            double percentage = player.getBetterBulletsPercentage();
+            double barWidth = 120 * percentage;
+            betterBulletsBarFill.setWidth(barWidth);
+            betterBulletsPercent.setText(String.format("%d%%", (int)(percentage * 100)));
+        }
+
+        // Slowdown powerup
+        boolean slowdownActive = player.isSlowdownActive();
+        slowdownLabel.setVisible(slowdownActive);
+        slowdownBarBg.setVisible(slowdownActive);
+        slowdownBarFill.setVisible(slowdownActive);
+        slowdownPercent.setVisible(slowdownActive);
+
+        if (slowdownActive) {
+            double percentage = player.getSlowdownPercentage();
+            double barWidth = 120 * percentage;
+            slowdownBarFill.setWidth(barWidth);
+            slowdownPercent.setText(String.format("%d%%", (int)(percentage * 100)));
         }
     }
 
