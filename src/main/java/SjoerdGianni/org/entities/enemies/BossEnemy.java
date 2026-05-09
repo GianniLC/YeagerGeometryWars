@@ -52,4 +52,9 @@ public class BossEnemy extends Enemy implements SceneBorderTouchingWatcher {
         dropPowerup(LifePowerup.class, 100);
         super.onDeath();
     }
+
+    @Override
+    public int getPointValue() {
+        return 25;
+    }
 }

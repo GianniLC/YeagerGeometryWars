@@ -134,11 +134,17 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
      * @implSpec Always call `super.onDeath()` when overriding this method
      */
     public void onDeath() {
-        // For future implementation:
-        // - Increase score of scoreboard
-        // - (Through @Override in a child class) Chance of dropping a specific powerup
+        // Add score when enemy dies
+        GameScene.addScore(getPointValue());
         remove();
     }
+
+    /**
+     * Get the point value awarded when this enemy is killed.
+     * 
+     * @return the number of points this enemy is worth
+     */
+    public abstract int getPointValue();
 
     @Override
     public void remove() {

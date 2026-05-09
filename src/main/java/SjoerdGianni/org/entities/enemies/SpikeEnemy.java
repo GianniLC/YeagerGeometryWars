@@ -44,4 +44,9 @@ public class SpikeEnemy extends Enemy {
         dropPowerup(BulletPowerup.class, 100);
         super.onDeath();
     }
+
+    @Override
+    public int getPointValue() {
+        return 1;
+    }
 }

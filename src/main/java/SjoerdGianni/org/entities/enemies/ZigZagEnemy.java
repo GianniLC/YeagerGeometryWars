@@ -55,4 +55,9 @@ public class ZigZagEnemy extends Enemy{
         dropPowerup(NukePowerup.class, 12.5);
         super.onDeath();
     }
+
+    @Override
+    public int getPointValue() {
+        return 5;
+    }
 }

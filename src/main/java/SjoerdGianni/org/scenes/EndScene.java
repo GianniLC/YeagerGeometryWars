@@ -49,7 +49,7 @@ public class EndScene extends StaticScene implements KeyListener {
         addEntity(finalScoreLabel);
 
         // Score value - display directly on black background (no box)
-        var scoreValue = new TextEntity(new Coordinate2D(640, 270), "1,234");
+        var scoreValue = new TextEntity(new Coordinate2D(640, 270), String.valueOf(GameScene.getScore()));
         scoreValue.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         scoreValue.setFill(Color.WHITE);
         scoreValue.setFont(Font.font("Arial", FontWeight.BOLD, 32));
@@ -157,7 +157,7 @@ public class EndScene extends StaticScene implements KeyListener {
         powerupsUsedLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(powerupsUsedLabel);
 
-        var powerupsUsedValue = new TextEntity(new Coordinate2D(365, 660), "[5]");
+        var powerupsUsedValue = new TextEntity(new Coordinate2D(365, 660), String.valueOf(GameScene.getPowerupsUsed()));
         powerupsUsedValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         powerupsUsedValue.setFill(Color.BLACK);
         powerupsUsedValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));

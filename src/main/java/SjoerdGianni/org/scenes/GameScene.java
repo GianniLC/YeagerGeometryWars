@@ -32,6 +32,23 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     private static final ArrayList<Bullet> bulletsToSpawn = new ArrayList<Bullet>();
     private static final ArrayList<Powerup> powerupsToSpawn = new ArrayList<Powerup>();
     private boolean isGameOver = false;
+    
+    private static int score = 0;
+    private static TextEntity scoreValueText;
+    
+    private static int powerupsUsed = 0;
+
+    // Powerup UI elements - Slot 1 (Better Bullets)
+    private TextEntity betterBulletsLabel;
+    private LabelBox betterBulletsBarBg;
+    private LabelBox betterBulletsBarFill;
+    private TextEntity betterBulletsPercent;
+
+    // Powerup UI elements - Slot 2 (Slowdown)
+    private TextEntity slowdownLabel;
+    private LabelBox slowdownBarBg;
+    private LabelBox slowdownBarFill;
+    private TextEntity slowdownPercent;
 
     public GameScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
@@ -53,9 +70,48 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         return System.currentTimeMillis();
     }
 
+    /**
+     * Add points to the player's score and update the score display.
+     * 
+     * @param points the number of points to add
+     */
+    public static void addScore(int points) {
+        score += points;
+        if (scoreValueText != null) {
+            scoreValueText.setText(String.format("%04d", score));
+        }
+    }
+
+    /**
+     * Get the current score.
+     * 
+     * @return the current score
+     */
+    public static int getScore() {
+        return score;
+    }
+
+    /**
+     * Increment the powerup usage counter.
+     */
+    public static void incrementPowerupsUsed() {
+        powerupsUsed++;
+    }
+
+    /**
+     * Get the total number of powerups used.
+     * 
+     * @return the number of powerups used
+     */
+    public static int getPowerupsUsed() {
+        return powerupsUsed;
+    }
+
     @Override
     public void setupScene() {
         setBackgroundColor(Color.BLACK);
+        score = 0; // Reset score when starting a new game
+        powerupsUsed = 0; // Reset powerup count when starting a new game
     }
 
     @Override
@@ -83,44 +139,59 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         scoreLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         addEntity(scoreLabel);
         
-        var scoreValue = new TextEntity(new Coordinate2D(640, 60), "0000");
-        scoreValue.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        scoreValue.setFill(Color.WHITE);
-        scoreValue.setFont(Font.font("Arial", FontWeight.BOLD, 32));
-        addEntity(scoreValue);
+        scoreValueText = new TextEntity(new Coordinate2D(640, 60), "0000");
+        scoreValueText.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        scoreValueText.setFill(Color.WHITE);
+        scoreValueText.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+        addEntity(scoreValueText);
 
-        // Compact power-up indicators (top right) - minimal design
-        // Triple Shot - small text and bar
-        var tripleShotLabel = new TextEntity(new Coordinate2D(1200, 30), "TRIPLE SHOT");
-        tripleShotLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        tripleShotLabel.setFill(Color.CYAN);
-        tripleShotLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        addEntity(tripleShotLabel);
+        // Powerup Slot 1 - Better Bullets (initially hidden)
+        betterBulletsLabel = new TextEntity(new Coordinate2D(1200, 30), "BETTER BULLETS");
+        betterBulletsLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        betterBulletsLabel.setFill(Color.YELLOW);
+        betterBulletsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        betterBulletsLabel.setVisible(false);
+        addEntity(betterBulletsLabel);
 
-        // Compact progress bar (cyan/blue)
-        var progressBarBg = new LabelBox(new Coordinate2D(1140, 45), 120, 8);
-        addEntity(progressBarBg);
+        betterBulletsBarBg = new LabelBox(new Coordinate2D(1140, 45), 120, 8);
+        betterBulletsBarBg.setVisible(false);
+        addEntity(betterBulletsBarBg);
 
-        // Progress bar fill in cyan
-        var progressBarFill = new LabelBox(new Coordinate2D(1140, 45), 90, 8); // 75% filled
-        addEntity(progressBarFill);
+        betterBulletsBarFill = new LabelBox(new Coordinate2D(1140, 45), 120, 8);
+        betterBulletsBarFill.setFill(Color.YELLOW);
+        betterBulletsBarFill.setVisible(false);
+        addEntity(betterBulletsBarFill);
 
-        var tripleShotTime = new TextEntity(new Coordinate2D(1200, 65), "75%");
-        tripleShotTime.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        tripleShotTime.setFill(Color.DARKGRAY);
-        tripleShotTime.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
-        addEntity(tripleShotTime);
+        betterBulletsPercent = new TextEntity(new Coordinate2D(1200, 65), "100%");
+        betterBulletsPercent.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        betterBulletsPercent.setFill(Color.DARKGRAY);
+        betterBulletsPercent.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        betterBulletsPercent.setVisible(false);
+        addEntity(betterBulletsPercent);
 
-        // Second power-up slot - compact version
-        var powerupSlotLabel = new TextEntity(new Coordinate2D(1200, 90), "[Power-up]");
-        powerupSlotLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        powerupSlotLabel.setFill(Color.DARKGRAY);
-        powerupSlotLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 11));
-        addEntity(powerupSlotLabel);
+        // Powerup Slot 2 - Slowdown (initially hidden)
+        slowdownLabel = new TextEntity(new Coordinate2D(1200, 90), "SLOWDOWN");
+        slowdownLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        slowdownLabel.setFill(Color.MEDIUMVIOLETRED);
+        slowdownLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        slowdownLabel.setVisible(false);
+        addEntity(slowdownLabel);
 
-        // Small bar placeholder for second power-up
-        var powerupBar = new LabelBox(new Coordinate2D(1140, 100), 120, 8);
-        addEntity(powerupBar);
+        slowdownBarBg = new LabelBox(new Coordinate2D(1140, 105), 120, 8);
+        slowdownBarBg.setVisible(false);
+        addEntity(slowdownBarBg);
+
+        slowdownBarFill = new LabelBox(new Coordinate2D(1140, 105), 120, 8);
+        slowdownBarFill.setFill(Color.MEDIUMVIOLETRED);
+        slowdownBarFill.setVisible(false);
+        addEntity(slowdownBarFill);
+
+        slowdownPercent = new TextEntity(new Coordinate2D(1200, 125), "100%");
+        slowdownPercent.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        slowdownPercent.setFill(Color.DARKGRAY);
+        slowdownPercent.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        slowdownPercent.setVisible(false);
+        addEntity(slowdownPercent);
 
         // Controls text (bottom right - no box, light gray)
         var controlsTitle = new TextEntity(new Coordinate2D(1150, 655), "WASD - Move");
@@ -140,39 +211,15 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         player.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         addEntity(player);
 
-        var playerLabel = new TextEntity(new Coordinate2D(660, 410), "[player]");
-        playerLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        playerLabel.setFill(Color.WHITE);
-        playerLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(playerLabel);
-
         // Enemies on the right side
         var normalEnemy = new NormalEnemy(new Coordinate2D(1000, 200));
         addEntity(normalEnemy);
 
-        var enemy1Label = new TextEntity(new Coordinate2D(1015, 250), "[enemy1]");
-        enemy1Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        enemy1Label.setFill(Color.WHITE);
-        enemy1Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(enemy1Label);
-
         var zigZagEnemy = new ZigZagEnemy(new Coordinate2D(1015, 360));
         addEntity(zigZagEnemy);
 
-        var enemy2Label = new TextEntity(new Coordinate2D(1015, 410), "[enemy2]");
-        enemy2Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        enemy2Label.setFill(Color.WHITE);
-        enemy2Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(enemy2Label);
-
         var spikeEnemy = new SpikeEnemy(new Coordinate2D(1015, 510));
         addEntity(spikeEnemy);
-
-        var enemy3Label = new TextEntity(new Coordinate2D(1015, 560), "[enemy3]");
-        enemy3Label.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        enemy3Label.setFill(Color.WHITE);
-        enemy3Label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(enemy3Label);
     }
 
     @Override
@@ -237,6 +284,44 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     public void explicitUpdate(long timestamp) {
         if (player != null && !player.isAlive()) {
             yaegerGame.setActiveScene(2);
+        }
+
+        // Update powerup UI
+        if (player != null) {
+            updatePowerupUI();
+        }
+    }
+
+    /**
+     * Update the powerup UI display based on active powerups
+     */
+    private void updatePowerupUI() {
+        // Better Bullets powerup
+        boolean betterBulletsActive = player.isBetterBulletsActive();
+        betterBulletsLabel.setVisible(betterBulletsActive);
+        betterBulletsBarBg.setVisible(betterBulletsActive);
+        betterBulletsBarFill.setVisible(betterBulletsActive);
+        betterBulletsPercent.setVisible(betterBulletsActive);
+
+        if (betterBulletsActive) {
+            double percentage = player.getBetterBulletsPercentage();
+            double barWidth = 120 * percentage;
+            betterBulletsBarFill.setWidth(barWidth);
+            betterBulletsPercent.setText(String.format("%d%%", (int)(percentage * 100)));
+        }
+
+        // Slowdown powerup
+        boolean slowdownActive = player.isSlowdownActive();
+        slowdownLabel.setVisible(slowdownActive);
+        slowdownBarBg.setVisible(slowdownActive);
+        slowdownBarFill.setVisible(slowdownActive);
+        slowdownPercent.setVisible(slowdownActive);
+
+        if (slowdownActive) {
+            double percentage = player.getSlowdownPercentage();
+            double barWidth = 120 * percentage;
+            slowdownBarFill.setWidth(barWidth);
+            slowdownPercent.setText(String.format("%d%%", (int)(percentage * 100)));
         }
     }
 

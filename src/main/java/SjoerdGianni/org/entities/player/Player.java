@@ -38,6 +38,10 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
 
     private boolean alive = true;
 
+    // Powerup tracking
+    private int betterBulletsDuration = 0;
+    private int slowdownDuration = 0;
+
     public Player(Coordinate2D initialLocation) {
         super(initialLocation);
         setRadius(15);
@@ -125,6 +129,8 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         setAttackSpeedInMs(2.0, durationInMs);
         setAttackDamage(1.5, durationInMs);
         setBulletMovementSpeed(1.5, durationInMs);
+        betterBulletsDuration = durationInMs;
+        GameScene.incrementPowerupsUsed();
     }
 
     /**
@@ -135,6 +141,42 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         setMovementSpeed(0.75, durationInMs);
         setAttackSpeedInMs(0.75, durationInMs);
         setBulletMovementSpeed(0.5, durationInMs);
+        slowdownDuration = durationInMs;
+        GameScene.incrementPowerupsUsed();
+    }
+
+    /**
+     * Check if the better bullets powerup is currently active
+     * @return true if active, false otherwise
+     */
+    public boolean isBetterBulletsActive(){
+        return attackDamage.isActive();
+    }
+
+    /**
+     * Check if the slowdown powerup is currently active
+     * @return true if active, false otherwise
+     */
+    public boolean isSlowdownActive(){
+        return movementSpeed.isActive() && movementSpeed.getValue() < movementSpeed.getBaseValue();
+    }
+
+    /**
+     * Get the remaining duration percentage for better bullets powerup
+     * @return percentage from 0.0 to 1.0
+     */
+    public double getBetterBulletsPercentage(){
+        long currentTimestamp = GameScene.getTimestamp();
+        return attackDamage.getRemainingPercentage(currentTimestamp, betterBulletsDuration);
+    }
+
+    /**
+     * Get the remaining duration percentage for slowdown powerup
+     * @return percentage from 0.0 to 1.0
+     */
+    public double getSlowdownPercentage(){
+        long currentTimestamp = GameScene.getTimestamp();
+        return movementSpeed.getRemainingPercentage(currentTimestamp, slowdownDuration);
     }
 
     /**
