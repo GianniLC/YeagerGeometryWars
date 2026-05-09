@@ -18,6 +18,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -228,28 +229,62 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     }
 
     /**
+     * Calculates a corrected coordinate value based on the mode. This function is necessary to prevent a bug where
+     * the player entity can move out of bounds in the corner of the screen when colliding with a boundry.
+     * @param mode Mode for selecting the correction logic. Allowed values are `"width"` and `"height"` (case-insensetive)
+     * @return Corrected coordinate value
+     */
+    private double cornerOutOfBoundsPrevention(String mode) {
+        List<String> allowedModes = Arrays.asList("width", "height");
+        double correctedValue;
+
+        String parsedMode = mode.toLowerCase();
+
+        if (!allowedModes.contains(parsedMode)){
+            String defaultMode = allowedModes.getFirst();
+            System.out.println("Mode '"+ mode + "' doesn't exist. Defaulting to '"+ defaultMode + "'");
+            parsedMode = defaultMode;
+        }
+
+        correctedValue = switch (parsedMode) {
+            case "width" ->
+                    Math.clamp(getAnchorLocation().getX(), 0 + (getWidth() / 2), getSceneWidth() - (getWidth() / 2));
+            case "height" ->
+                    Math.clamp(getAnchorLocation().getY(), 0 + (getHeight() / 2), getSceneHeight() - (getHeight() / 2));
+            default -> {
+                System.out.println("ERROR: Corrected value logic fell back to default switch case");
+                yield 0.0;
+            }
+        };
+
+        return correctedValue;
+    }
+
+    /**
      * Logic to prevent player from going outside of the playable field.
-     * The code is directly copied from the
+     * The code was directly copied from the
      * <a href="https://han-yaeger.github.io/yaeger-tutorial/player-controlled.html#make-sure-hanny-doesnt-leave-the-scene">
      *     Yaeger player entity tutorial
-     * </a>
+     * </a>, but modified to fit the Anchorpoint CENTER_CENTER mode and fix a bug with going out-of-bounds in a corner
      */
     @Override
     public void notifyBoundaryTouching(SceneBorder border){
-        setSpeed(0);
-
         switch(border){
             case TOP:
-                setAnchorLocationY(1);
+                setAnchorLocationY(getHeight() / 2);
+                setAnchorLocationX(cornerOutOfBoundsPrevention("width"));
                 break;
             case BOTTOM:
-                setAnchorLocationY(getSceneHeight() - getHeight() - 1);
+                setAnchorLocationY(getSceneHeight() - (getHeight()) / 2);
+                setAnchorLocationX(cornerOutOfBoundsPrevention("width"));
                 break;
             case LEFT:
-                setAnchorLocationX(1);
+                setAnchorLocationX(getWidth() / 2);
+                setAnchorLocationY(cornerOutOfBoundsPrevention("height"));
                 break;
             case RIGHT:
-                setAnchorLocationX(getSceneWidth() - getWidth() - 1);
+                setAnchorLocationX(getSceneWidth() - (getWidth() / 2));
+                setAnchorLocationY(cornerOutOfBoundsPrevention("height"));
             default:
                 break;
         }
