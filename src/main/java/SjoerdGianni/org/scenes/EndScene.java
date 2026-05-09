@@ -125,7 +125,7 @@ public class EndScene extends StaticScene implements KeyListener {
         enemiesKilledLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(enemiesKilledLabel);
 
-        var enemiesKilledValue = new TextEntity(new Coordinate2D(365, 580), "[123]");
+        var enemiesKilledValue = new TextEntity(new Coordinate2D(365, 580), String.valueOf(GameScene.getEnemiesKilled()));
         enemiesKilledValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         enemiesKilledValue.setFill(Color.BLACK);
         enemiesKilledValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -141,7 +141,7 @@ public class EndScene extends StaticScene implements KeyListener {
         timeSurvivedLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(timeSurvivedLabel);
 
-        var timeSurvivedValue = new TextEntity(new Coordinate2D(745, 580), "[2:34]");
+        var timeSurvivedValue = new TextEntity(new Coordinate2D(745, 580), GameScene.getSurvivalTime());
         timeSurvivedValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         timeSurvivedValue.setFill(Color.BLACK);
         timeSurvivedValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -173,7 +173,7 @@ public class EndScene extends StaticScene implements KeyListener {
         accuracyLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(accuracyLabel);
 
-        var accuracyValue = new TextEntity(new Coordinate2D(745, 660), "[45%]");
+        var accuracyValue = new TextEntity(new Coordinate2D(745, 660), GameScene.getAccuracy());
         accuracyValue.setAnchorPoint(AnchorPoint.CENTER_LEFT);
         accuracyValue.setFill(Color.BLACK);
         accuracyValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));

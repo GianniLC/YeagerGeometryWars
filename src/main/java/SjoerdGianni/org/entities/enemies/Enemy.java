@@ -91,6 +91,7 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
     private void onHitByBullet(Bullet bullet) {
         bullet.remove();
         applyDamage(bullet.getDamagePoints());
+        GameScene.incrementBulletsHit();
     }
 
     @Override
@@ -136,6 +137,7 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
     public void onDeath() {
         // Add score when enemy dies
         GameScene.addScore(getPointValue());
+        GameScene.incrementEnemiesKilled();
         remove();
     }
 

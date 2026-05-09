@@ -38,6 +38,15 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     
     private static int powerupsUsed = 0;
 
+    // Accuracy tracking
+    private static int bulletsFired = 0;
+    private static int bulletsHit = 0;
+
+    // Game statistics
+    private static int enemiesKilled = 0;
+    private static long gameStartTime = 0;
+    private static long gameEndTime = 0;
+
     // Powerup UI elements - Slot 1 (Better Bullets)
     private TextEntity betterBulletsLabel;
     private LabelBox betterBulletsBarBg;
@@ -49,6 +58,9 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     private LabelBox slowdownBarBg;
     private LabelBox slowdownBarFill;
     private TextEntity slowdownPercent;
+
+    // Health UI elements
+    private TextEntity[] hearts = new TextEntity[3];
 
     public GameScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
@@ -107,11 +119,73 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         return powerupsUsed;
     }
 
+    /**
+     * Increment the bullets fired counter.
+     */
+    public static void incrementBulletsFired() {
+        bulletsFired++;
+    }
+
+    /**
+     * Increment the bullets hit counter.
+     */
+    public static void incrementBulletsHit() {
+        bulletsHit++;
+    }
+
+    /**
+     * Calculate the accuracy percentage.
+     * 
+     * @return the accuracy as a percentage string (e.g., "69%"), or "0%" if no bullets fired
+     */
+    public static String getAccuracy() {
+        if (bulletsFired == 0) {
+            return "0%";
+        }
+        int accuracyPercent = (int) Math.round((double) bulletsHit / bulletsFired * 100);
+        return accuracyPercent + "%";
+    }
+
+    /**
+     * Increment the enemies killed counter.
+     */
+    public static void incrementEnemiesKilled() {
+        enemiesKilled++;
+    }
+
+    /**
+     * Get the total number of enemies killed.
+     * 
+     * @return the number of enemies killed
+     */
+    public static int getEnemiesKilled() {
+        return enemiesKilled;
+    }
+
+    /**
+     * Get the survival time formatted as MM:SS.
+     * 
+     * @return the survival time as a formatted string
+     */
+    public static String getSurvivalTime() {
+        long endTime = gameEndTime > 0 ? gameEndTime : System.currentTimeMillis();
+        long survivalTimeMs = endTime - gameStartTime;
+        long totalSeconds = survivalTimeMs / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        return String.format("%d:%02d", minutes, seconds);
+    }
+
     @Override
     public void setupScene() {
         setBackgroundColor(Color.BLACK);
         score = 0; // Reset score when starting a new game
         powerupsUsed = 0; // Reset powerup count when starting a new game
+        bulletsFired = 0; // Reset bullets fired
+        bulletsHit = 0; // Reset bullets hit
+        enemiesKilled = 0; // Reset enemies killed
+        gameStartTime = System.currentTimeMillis(); // Record game start time
+        gameEndTime = 0;
     }
 
     @Override
@@ -125,11 +199,11 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
 
         // Health indicator hearts - no boxes, just hearts
         for (int i = 0; i < 3; i++) {
-            var heart = new TextEntity(new Coordinate2D(115 + (i * 35), 28), "♥");
-            heart.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-            heart.setFill(Color.RED);
-            heart.setFont(Font.font("Arial", FontWeight.BOLD, 28));
-            addEntity(heart);
+            hearts[i] = new TextEntity(new Coordinate2D(115 + (i * 35), 28), "♥");
+            hearts[i].setAnchorPoint(AnchorPoint.CENTER_CENTER);
+            hearts[i].setFill(Color.RED);
+            hearts[i].setFont(Font.font("Arial", FontWeight.BOLD, 28));
+            addEntity(hearts[i]);
         }
 
         // Score display (top center) - no box, just white text
@@ -283,12 +357,30 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     @Override
     public void explicitUpdate(long timestamp) {
         if (player != null && !player.isAlive()) {
+            gameEndTime = System.currentTimeMillis(); // Record game end time
             yaegerGame.setActiveScene(2);
         }
 
-        // Update powerup UI
+        // Update powerup UI and health display
         if (player != null) {
             updatePowerupUI();
+            updateHealthUI();
+        }
+    }
+
+    /**
+     * Update the health hearts display based on current player lives
+     */
+    private void updateHealthUI() {
+        int currentLives = player.getLives();
+        for (int i = 0; i < hearts.length; i++) {
+            if (i < currentLives) {
+                hearts[i].setFill(Color.RED);
+                hearts[i].setOpacity(1.0);
+            } else {
+                hearts[i].setFill(Color.DARKGRAY);
+                hearts[i].setOpacity(0.3);
+            }
         }
     }
 
@@ -327,9 +419,8 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
 
     @Override
     public void onPressedKeysChange(Set<KeyCode> input) {
-        if (input.contains(KeyCode.SPACE)) {
-            yaegerGame.setActiveScene(2);
-        }
+        // Game ends automatically when player health reaches 0
+        // No manual exit key needed
     }
 
     @Override

@@ -42,6 +42,12 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     private int betterBulletsDuration = 0;
     private int slowdownDuration = 0;
 
+    // Invulnerability tracking
+    private boolean isInvulnerable = false;
+    private long invulnerabilityEndTime = 0;
+    private static final int INVULNERABILITY_DURATION_MS = 1000; // 1 second
+    private static final int FLICKER_INTERVAL_MS = 100; // Flicker every 100ms
+
     public Player(Coordinate2D initialLocation) {
         super(initialLocation);
         setRadius(15);
@@ -70,6 +76,19 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         bulletMovementSpeed.update(currentTimestamp);
 
         currentPosition = getAnchorLocation();
+
+        // Update invulnerability status and flicker effect
+        if (isInvulnerable) {
+            if (currentTimestamp >= invulnerabilityEndTime) {
+                isInvulnerable = false;
+                setOpacity(1.0); // Make sure player is fully visible when invulnerability ends
+            } else {
+                // Flicker effect: toggle visibility every FLICKER_INTERVAL_MS
+                long timeSinceHit = currentTimestamp - (invulnerabilityEndTime - INVULNERABILITY_DURATION_MS);
+                boolean shouldBeVisible = (timeSinceHit / FLICKER_INTERVAL_MS) % 2 == 0;
+                setOpacity(shouldBeVisible ? 1.0 : 0.3);
+            }
+        }
 
         if (mousePressed){
             shoot();
@@ -191,6 +210,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
             return;
         }
         GameScene.spawnBullet(new Bullet(getPlayerPosition(), mousePosition, attackDamage.getValue(), Enemy.class, bulletMovementSpeed.getValue()));
+        GameScene.incrementBulletsFired();
         lastShotTime = GameScene.getTimestamp();
     }
 
@@ -200,6 +220,14 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
 
     public boolean isAlive(){
         return alive;
+    }
+
+    /**
+     * Get the current number of lives the player has.
+     * @return the number of lives remaining
+     */
+    public int getLives() {
+        return lives;
     }
 
     /**
@@ -238,17 +266,36 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     public void alterLives(int change) {
         lives += change;
 
+        // Activate invulnerability when taking damage
+        if (change < 0) {
+            activateInvulnerability();
+        }
+
         if (lives <= 0){
             this.onDeath();
         }
     }
 
+    /**
+     * Activate invulnerability for a short duration.
+     */
+    private void activateInvulnerability() {
+        isInvulnerable = true;
+        invulnerabilityEndTime = GameScene.getTimestamp() + INVULNERABILITY_DURATION_MS;
+    }
+
     private void onHitByEnemy(Enemy enemy){
+        if (isInvulnerable) {
+            return; // Don't take damage if invulnerable
+        }
         enemy.remove();
         alterLives(-1);
     }
 
     private void onHitByBullet(Bullet bullet){
+        if (isInvulnerable) {
+            return; // Don't take damage if invulnerable
+        }
         bullet.remove();
         alterLives(-1);
     }
