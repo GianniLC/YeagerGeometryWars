@@ -12,12 +12,20 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import SjoerdGianni.org.entities.Button;
 import SjoerdGianni.org.entities.LabelBox;
 
 import java.util.Set;
 
 public class TitleScene extends StaticScene implements KeyListener, MouseButtonPressedListener {
     private final YaegerGame yaegerGame;
+    
+    // Main menu buttons
+    private Button easyButton;
+    private Button mediumButton;
+    private Button hardButton;
+    private Button settingsButton;
+    private Button backButton;
     
     // Settings overlay entities
     private LabelBox settingsOverlayBg;
@@ -27,8 +35,7 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
     private TextEntity friendlyFireCheckmark;
     private TextEntity friendlyFireLabel;
     private TextEntity friendlyFireDesc;
-    private LabelBox closeButton;
-    private TextEntity closeButtonLabel;
+    private Button closeButton;
     private boolean settingsVisible = false;
 
     public TitleScene(YaegerGame yaegerGame) {
@@ -71,15 +78,13 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         clickDifficultyHint.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(clickDifficultyHint);
 
-        // EASY difficulty box
-        var easyBox = new LabelBox(new Coordinate2D(365, 310), 550, 55);
-        addEntity(easyBox);
-        
-        var easyLabel = new TextEntity(new Coordinate2D(390, 325), "EASY");
-        easyLabel.setAnchorPoint(AnchorPoint.CENTER_LEFT);
-        easyLabel.setFill(Color.BLACK);
-        easyLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(easyLabel);
+        // EASY difficulty button
+        easyButton = new Button(new Coordinate2D(365, 310), 550, 55, "EASY");
+        easyButton.getLabel().setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        easyButton.getLabel().setX(390);
+        easyButton.getLabel().setY(325);
+        addEntity(easyButton.getBox());
+        addEntity(easyButton.getLabel());
 
         var easySpawnText = new TextEntity(new Coordinate2D(390, 350), "Enemies spawn every 3.5-7s");
         easySpawnText.setAnchorPoint(AnchorPoint.CENTER_LEFT);
@@ -87,15 +92,13 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         easySpawnText.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(easySpawnText);
 
-        // MEDIUM difficulty box
-        var mediumBox = new LabelBox(new Coordinate2D(365, 375), 550, 55);
-        addEntity(mediumBox);
-        
-        var mediumLabel = new TextEntity(new Coordinate2D(390, 390), "MEDIUM");
-        mediumLabel.setAnchorPoint(AnchorPoint.CENTER_LEFT);
-        mediumLabel.setFill(Color.BLACK);
-        mediumLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(mediumLabel);
+        // MEDIUM difficulty button
+        mediumButton = new Button(new Coordinate2D(365, 375), 550, 55, "MEDIUM");
+        mediumButton.getLabel().setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        mediumButton.getLabel().setX(390);
+        mediumButton.getLabel().setY(390);
+        addEntity(mediumButton.getBox());
+        addEntity(mediumButton.getLabel());
 
         var mediumSpawnText = new TextEntity(new Coordinate2D(390, 415), "Enemies spawn every 2-5s");
         mediumSpawnText.setAnchorPoint(AnchorPoint.CENTER_LEFT);
@@ -103,15 +106,13 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         mediumSpawnText.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(mediumSpawnText);
 
-        // HARD difficulty box
-        var hardBox = new LabelBox(new Coordinate2D(365, 440), 550, 55);
-        addEntity(hardBox);
-        
-        var hardLabel = new TextEntity(new Coordinate2D(390, 455), "HARD");
-        hardLabel.setAnchorPoint(AnchorPoint.CENTER_LEFT);
-        hardLabel.setFill(Color.BLACK);
-        hardLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(hardLabel);
+        // HARD difficulty button
+        hardButton = new Button(new Coordinate2D(365, 440), 550, 55, "HARD");
+        hardButton.getLabel().setAnchorPoint(AnchorPoint.CENTER_LEFT);
+        hardButton.getLabel().setX(390);
+        hardButton.getLabel().setY(455);
+        addEntity(hardButton.getBox());
+        addEntity(hardButton.getLabel());
 
         var hardSpawnText = new TextEntity(new Coordinate2D(390, 480), "Enemies spawn every 1.5-3.5s");
         hardSpawnText.setAnchorPoint(AnchorPoint.CENTER_LEFT);
@@ -119,25 +120,17 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         hardSpawnText.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         addEntity(hardSpawnText);
 
-        // Settings button (bottom left area)
-        var settingsBox = new LabelBox(new Coordinate2D(365, 540), 120, 40);
-        addEntity(settingsBox);
-        
-        var settingsLabel = new TextEntity(new Coordinate2D(425, 560), "Settings");
-        settingsLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        settingsLabel.setFill(Color.BLACK);
-        settingsLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
-        addEntity(settingsLabel);
+        // Settings button
+        settingsButton = new Button(new Coordinate2D(365, 540), 120, 40, "Settings", 
+                                    Color.WHITE, Color.BLACK, 16, FontWeight.NORMAL);
+        addEntity(settingsButton.getBox());
+        addEntity(settingsButton.getLabel());
 
-        // Back to desktop button (bottom right area)
-        var backBox = new LabelBox(new Coordinate2D(795, 540), 120, 40);
-        addEntity(backBox);
-        
-        var backLabel = new TextEntity(new Coordinate2D(855, 560), "Back to desktop");
-        backLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        backLabel.setFill(Color.BLACK);
-        backLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 13));
-        addEntity(backLabel);
+        // Back to desktop button
+        backButton = new Button(new Coordinate2D(795, 540), 120, 40, "Back to desktop",
+                                Color.WHITE, Color.BLACK, 13, FontWeight.NORMAL);
+        addEntity(backButton.getBox());
+        addEntity(backButton.getLabel());
 
         // Settings overlay - semi-transparent background (initially hidden)
         settingsOverlayBg = new LabelBox(new Coordinate2D(0, 0), 1280, 720);
@@ -191,16 +184,10 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         addEntity(friendlyFireDesc);
 
         // Close button
-        closeButton = new LabelBox(new Coordinate2D(565, 450), 150, 50);
+        closeButton = new Button(new Coordinate2D(565, 450), 150, 50, "CLOSE");
         closeButton.setOpacity(0);
-        addEntity(closeButton);
-
-        closeButtonLabel = new TextEntity(new Coordinate2D(640, 475), "CLOSE");
-        closeButtonLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        closeButtonLabel.setFill(Color.BLACK);
-        closeButtonLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        closeButtonLabel.setOpacity(0);
-        addEntity(closeButtonLabel);
+        addEntity(closeButton.getBox());
+        addEntity(closeButton.getLabel());
     }
 
     @Override
@@ -219,34 +206,34 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
             if (x >= 420 && x <= 445 && y >= 310 && y <= 335) {
                 toggleFriendlyFire();
             }
-            // Check if clicked on CLOSE button (x: 565-715, y: 450-500)
-            else if (x >= 565 && x <= 715 && y >= 450 && y <= 500) {
+            // Check if clicked on CLOSE button
+            else if (closeButton.contains(x, y)) {
                 hideSettings();
             }
             return; // Don't process other clicks while settings are open
         }
 
-        // Check if clicked on EASY (y: 310-365, x: 365-915)
-        if (x >= 365 && x <= 915 && y >= 310 && y <= 365) {
+        // Check if clicked on EASY
+        if (easyButton.contains(x, y)) {
             GameScene.setDifficulty("EASY");
             yaegerGame.setActiveScene(1);
         }
-        // Check if clicked on MEDIUM (y: 375-430, x: 365-915)
-        else if (x >= 365 && x <= 915 && y >= 375 && y <= 430) {
+        // Check if clicked on MEDIUM
+        else if (mediumButton.contains(x, y)) {
             GameScene.setDifficulty("MEDIUM");
             yaegerGame.setActiveScene(1);
         }
-        // Check if clicked on HARD (y: 440-495, x: 365-915)
-        else if (x >= 365 && x <= 915 && y >= 440 && y <= 495) {
+        // Check if clicked on HARD
+        else if (hardButton.contains(x, y)) {
             GameScene.setDifficulty("HARD");
             yaegerGame.setActiveScene(1);
         }
-        // Check if clicked on SETTINGS button (x: 365-485, y: 540-580)
-        else if (x >= 365 && x <= 485 && y >= 540 && y <= 580) {
+        // Check if clicked on SETTINGS button
+        else if (settingsButton.contains(x, y)) {
             showSettings();
         }
-        // Check if clicked on BACK TO DESKTOP button (x: 795-915, y: 540-580)
-        else if (x >= 795 && x <= 915 && y >= 540 && y <= 580) {
+        // Check if clicked on BACK TO DESKTOP button
+        else if (backButton.contains(x, y)) {
             yaegerGame.quit();
         }
     }
@@ -260,7 +247,6 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         friendlyFireLabel.setOpacity(1);
         friendlyFireDesc.setOpacity(1);
         closeButton.setOpacity(1);
-        closeButtonLabel.setOpacity(1);
         
         // Update checkmark visibility based on current setting
         updateCheckmark();
@@ -276,7 +262,6 @@ public class TitleScene extends StaticScene implements KeyListener, MouseButtonP
         friendlyFireLabel.setOpacity(0);
         friendlyFireDesc.setOpacity(0);
         closeButton.setOpacity(0);
-        closeButtonLabel.setOpacity(0);
     }
 
     private void toggleFriendlyFire() {

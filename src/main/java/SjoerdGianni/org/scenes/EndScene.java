@@ -12,12 +12,17 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import SjoerdGianni.org.entities.Button;
 import SjoerdGianni.org.entities.LabelBox;
 
 import java.util.Set;
 
 public class EndScene extends StaticScene implements KeyListener, MouseButtonPressedListener {
     private final YaegerGame yaegerGame;
+    
+    // Buttons
+    private Button restartButton;
+    private Button menuButton;
 
     public EndScene(YaegerGame yaegerGame) {
         this.yaegerGame = yaegerGame;
@@ -74,25 +79,15 @@ public class EndScene extends StaticScene implements KeyListener, MouseButtonPre
         difficultyValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         addEntity(difficultyValue);
 
-        // RESTART button - white box
-        var restartBox = new LabelBox(new Coordinate2D(475, 400), 130, 60);
-        addEntity(restartBox);
-        
-        var restartLabel = new TextEntity(new Coordinate2D(540, 430), "RESTART");
-        restartLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        restartLabel.setFill(Color.BLACK);
-        restartLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(restartLabel);
+        // RESTART button
+        restartButton = new Button(new Coordinate2D(475, 400), 130, 60, "RESTART");
+        addEntity(restartButton.getBox());
+        addEntity(restartButton.getLabel());
 
-        // MENU button - white box
-        var menuBox = new LabelBox(new Coordinate2D(675, 400), 130, 60);
-        addEntity(menuBox);
-        
-        var menuLabel = new TextEntity(new Coordinate2D(740, 430), "MENU");
-        menuLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        menuLabel.setFill(Color.BLACK);
-        menuLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(menuLabel);
+        // MENU button
+        menuButton = new Button(new Coordinate2D(675, 400), 130, 60, "MENU");
+        addEntity(menuButton.getBox());
+        addEntity(menuButton.getLabel());
 
         // Game Statistics section
         var statsTitle = new TextEntity(new Coordinate2D(640, 500), "GAME STATISTICS");
@@ -184,12 +179,12 @@ public class EndScene extends StaticScene implements KeyListener, MouseButtonPre
         double x = coordinate2D.getX();
         double y = coordinate2D.getY();
 
-        // Check if clicked on RESTART button (x: 475-605, y: 400-460)
-        if (x >= 475 && x <= 605 && y >= 400 && y <= 460) {
+        // Check if clicked on RESTART button
+        if (restartButton.contains(x, y)) {
             yaegerGame.setActiveScene(1); // Restart game
         }
-        // Check if clicked on MENU button (x: 675-805, y: 400-460)
-        else if (x >= 675 && x <= 805 && y >= 400 && y <= 460) {
+        // Check if clicked on MENU button
+        else if (menuButton.contains(x, y)) {
             yaegerGame.setActiveScene(0); // Return to menu
         }
     }
