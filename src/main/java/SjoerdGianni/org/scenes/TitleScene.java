@@ -3,18 +3,20 @@ package SjoerdGianni.org.scenes;
 import com.github.hanyaeger.api.YaegerGame;
 import com.github.hanyaeger.api.scenes.StaticScene;
 import com.github.hanyaeger.api.AnchorPoint;
+import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.userinput.KeyListener;
+import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import com.github.hanyaeger.api.Coordinate2D;
 import SjoerdGianni.org.entities.LabelBox;
 
 import java.util.Set;
 
-public class TitleScene extends StaticScene implements KeyListener {
+public class TitleScene extends StaticScene implements KeyListener, MouseButtonPressedListener {
     private final YaegerGame yaegerGame;
 
     public TitleScene(YaegerGame yaegerGame) {
@@ -128,7 +130,27 @@ public class TitleScene extends StaticScene implements KeyListener {
 
     @Override
     public void onPressedKeysChange(Set<KeyCode> input) {
-        if (input.contains(KeyCode.SPACE)) {
+        // Difficulty selection now handled by mouse clicks
+    }
+
+    @Override
+    public void onMouseButtonPressed(MouseButton button, Coordinate2D coordinate2D) {
+        double x = coordinate2D.getX();
+        double y = coordinate2D.getY();
+
+        // Check if clicked on EASY (y: 310-365, x: 365-915)
+        if (x >= 365 && x <= 915 && y >= 310 && y <= 365) {
+            GameScene.setDifficulty("EASY");
+            yaegerGame.setActiveScene(1);
+        }
+        // Check if clicked on MEDIUM (y: 375-430, x: 365-915)
+        else if (x >= 365 && x <= 915 && y >= 375 && y <= 430) {
+            GameScene.setDifficulty("MEDIUM");
+            yaegerGame.setActiveScene(1);
+        }
+        // Check if clicked on HARD (y: 440-495, x: 365-915)
+        else if (x >= 365 && x <= 915 && y >= 440 && y <= 495) {
+            GameScene.setDifficulty("HARD");
             yaegerGame.setActiveScene(1);
         }
     }

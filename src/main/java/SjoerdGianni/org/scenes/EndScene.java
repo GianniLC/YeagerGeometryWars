@@ -3,18 +3,20 @@ package SjoerdGianni.org.scenes;
 import com.github.hanyaeger.api.YaegerGame;
 import com.github.hanyaeger.api.scenes.StaticScene;
 import com.github.hanyaeger.api.AnchorPoint;
+import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.impl.TextEntity;
 import com.github.hanyaeger.api.userinput.KeyListener;
+import com.github.hanyaeger.api.userinput.MouseButtonPressedListener;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import com.github.hanyaeger.api.Coordinate2D;
 import SjoerdGianni.org.entities.LabelBox;
 
 import java.util.Set;
 
-public class EndScene extends StaticScene implements KeyListener {
+public class EndScene extends StaticScene implements KeyListener, MouseButtonPressedListener {
     private final YaegerGame yaegerGame;
 
     public EndScene(YaegerGame yaegerGame) {
@@ -66,7 +68,7 @@ public class EndScene extends StaticScene implements KeyListener {
         addEntity(difficultyLabel);
 
         // Difficulty value - display directly on black background
-        var difficultyValue = new TextEntity(new Coordinate2D(640, 352), "MEDIUM");
+        var difficultyValue = new TextEntity(new Coordinate2D(640, 352), GameScene.getDifficulty());
         difficultyValue.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         difficultyValue.setFill(Color.WHITE);
         difficultyValue.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -76,33 +78,21 @@ public class EndScene extends StaticScene implements KeyListener {
         var restartBox = new LabelBox(new Coordinate2D(475, 400), 130, 60);
         addEntity(restartBox);
         
-        var restartLabel = new TextEntity(new Coordinate2D(540, 422), "RESTART");
+        var restartLabel = new TextEntity(new Coordinate2D(540, 430), "RESTART");
         restartLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         restartLabel.setFill(Color.BLACK);
         restartLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         addEntity(restartLabel);
 
-        var restartHint = new TextEntity(new Coordinate2D(540, 445), "Press R");
-        restartHint.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        restartHint.setFill(Color.DARKGRAY);
-        restartHint.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(restartHint);
-
-        // MENU button - white box
-        var menuBox = new LabelBox(new Coordinate2D(675, 400), 130, 60);
-        addEntity(menuBox);
+        // QUIT button - white box
+        var quitBox = new LabelBox(new Coordinate2D(675, 400), 130, 60);
+        addEntity(quitBox);
         
-        var menuLabel = new TextEntity(new Coordinate2D(740, 422), "MENU");
-        menuLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        menuLabel.setFill(Color.BLACK);
-        menuLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        addEntity(menuLabel);
-
-        var menuHint = new TextEntity(new Coordinate2D(740, 445), "Press M");
-        menuHint.setAnchorPoint(AnchorPoint.CENTER_CENTER);
-        menuHint.setFill(Color.DARKGRAY);
-        menuHint.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        addEntity(menuHint);
+        var quitLabel = new TextEntity(new Coordinate2D(740, 430), "QUIT");
+        quitLabel.setAnchorPoint(AnchorPoint.CENTER_CENTER);
+        quitLabel.setFill(Color.BLACK);
+        quitLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        addEntity(quitLabel);
 
         // Game Statistics section
         var statsTitle = new TextEntity(new Coordinate2D(640, 500), "GAME STATISTICS");
@@ -182,8 +172,25 @@ public class EndScene extends StaticScene implements KeyListener {
 
     @Override
     public void onPressedKeysChange(Set<KeyCode> input) {
-        if (input.contains(KeyCode.SPACE)) {
-            yaegerGame.setActiveScene(0);
+        if (input.contains(KeyCode.R)) {
+            yaegerGame.setActiveScene(1); // Restart game
+        } else if (input.contains(KeyCode.Q) || input.contains(KeyCode.ESCAPE)) {
+            yaegerGame.quit(); // Close the game
+        }
+    }
+
+    @Override
+    public void onMouseButtonPressed(MouseButton button, Coordinate2D coordinate2D) {
+        double x = coordinate2D.getX();
+        double y = coordinate2D.getY();
+
+        // Check if clicked on RESTART button (x: 475-605, y: 400-460)
+        if (x >= 475 && x <= 605 && y >= 400 && y <= 460) {
+            yaegerGame.setActiveScene(1); // Restart game
+        }
+        // Check if clicked on QUIT button (x: 675-805, y: 400-460)
+        else if (x >= 675 && x <= 805 && y >= 400 && y <= 460) {
+            yaegerGame.quit(); // Close the game
         }
     }
 }

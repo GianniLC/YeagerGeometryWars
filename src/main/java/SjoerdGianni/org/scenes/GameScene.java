@@ -2,6 +2,8 @@ package SjoerdGianni.org.scenes;
 
 import SjoerdGianni.org.entities.LabelBox;
 import SjoerdGianni.org.entities.bullets.Bullet;
+import SjoerdGianni.org.entities.enemies.BossEnemy;
+import SjoerdGianni.org.entities.enemies.Enemy;
 import SjoerdGianni.org.entities.enemies.NormalEnemy;
 import SjoerdGianni.org.entities.enemies.SpikeEnemy;
 import SjoerdGianni.org.entities.enemies.ZigZagEnemy;
@@ -46,6 +48,11 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
     private static int enemiesKilled = 0;
     private static long gameStartTime = 0;
     private static long gameEndTime = 0;
+
+    // Difficulty settings
+    private static String difficulty = "MEDIUM"; // Default
+    private long enemySpawnInterval = 2000; // Milliseconds between spawns
+    private long lastEnemySpawnTime = 0;
 
     // Powerup UI elements - Slot 1 (Better Bullets)
     private TextEntity betterBulletsLabel;
@@ -176,6 +183,24 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         return String.format("%d:%02d", minutes, seconds);
     }
 
+    /**
+     * Set the game difficulty which affects enemy spawn rates.
+     * 
+     * @param diff the difficulty level ("EASY", "MEDIUM", or "HARD")
+     */
+    public static void setDifficulty(String diff) {
+        difficulty = diff;
+    }
+
+    /**
+     * Get the current difficulty setting.
+     * 
+     * @return the current difficulty level
+     */
+    public static String getDifficulty() {
+        return difficulty;
+    }
+
     @Override
     public void setupScene() {
         setBackgroundColor(Color.BLACK);
@@ -186,6 +211,20 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         enemiesKilled = 0; // Reset enemies killed
         gameStartTime = System.currentTimeMillis(); // Record game start time
         gameEndTime = 0;
+        lastEnemySpawnTime = 0; // Reset spawn timer
+        
+        // Set spawn interval based on difficulty
+        switch (difficulty) {
+            case "EASY":
+                enemySpawnInterval = (long) (3500 + Math.random() * 3500); // 3.5-7 seconds
+                break;
+            case "HARD":
+                enemySpawnInterval = (long) (1500 + Math.random() * 2000); // 1.5-3.5 seconds
+                break;
+            default: // MEDIUM
+                enemySpawnInterval = (long) (2000 + Math.random() * 3000); // 2-5 seconds
+                break;
+        }
     }
 
     @Override
@@ -284,16 +323,6 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
         player = new Player(new Coordinate2D(getWidth() / 2, getHeight() / 2));
         player.setAnchorPoint(AnchorPoint.CENTER_CENTER);
         addEntity(player);
-
-        // Enemies on the right side
-        var normalEnemy = new NormalEnemy(new Coordinate2D(1000, 200));
-        addEntity(normalEnemy);
-
-        var zigZagEnemy = new ZigZagEnemy(new Coordinate2D(1015, 360));
-        addEntity(zigZagEnemy);
-
-        var spikeEnemy = new SpikeEnemy(new Coordinate2D(1015, 510));
-        addEntity(spikeEnemy);
     }
 
     @Override
@@ -307,16 +336,38 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
             }
         });
 
-        // // Enemy spawner
-        // addEntitySpawner(new EntitySpawner(enemySpawnInterval) {
-        // @Override
-        // protected void spawnEntities() {
-        // if (!isGameOver) {
-        // spawnRandomEnemy();
-        // }
-        // }
-        // });
-        //
+        // Enemy spawner with difficulty-based intervals
+        addEntitySpawner(new EntitySpawner(100) {
+            @Override
+            protected void spawnEntities() {
+                if (!isGameOver) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastEnemySpawnTime >= enemySpawnInterval) {
+                        // Spawn 5-10 enemies at once
+                        int enemyCount = (int) (5 + Math.random() * 6); // 5-10 enemies
+                        for (int i = 0; i < enemyCount; i++) {
+                            spawnRandomEnemy();
+                        }
+                        
+                        lastEnemySpawnTime = currentTime;
+                        
+                        // Randomize next spawn interval within difficulty range
+                        switch (difficulty) {
+                            case "EASY":
+                                enemySpawnInterval = (long) (3500 + Math.random() * 3500); // 3.5-7s
+                                break;
+                            case "HARD":
+                                enemySpawnInterval = (long) (1500 + Math.random() * 2000); // 1.5-3.5s
+                                break;
+                            default: // MEDIUM
+                                enemySpawnInterval = (long) (2000 + Math.random() * 3000); // 2-5s
+                                break;
+                        }
+                    }
+                }
+            }
+        });
+
         // PowerUp spawner
         addEntitySpawner(new EntitySpawner(50) {
             @Override
@@ -349,6 +400,62 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, K
             addEntity(powerup);
         }
         powerupsToSpawn.clear();
+    }
+
+    /**
+     * Spawn a random enemy at a random edge location using weighted probabilities.
+     * Weights ensure common enemies spawn more frequently than rare ones.
+     */
+    private void spawnRandomEnemy() {
+        // Generate random spawn position at screen edges
+        Coordinate2D spawnLocation = getRandomEdgePosition();
+        
+        // Weighted enemy spawning
+        // NormalEnemy: 50% chance (0-49)
+        // ZigZagEnemy: 25% chance (50-74)
+        // SpikeEnemy: 20% chance (75-94)
+        // BossEnemy: 5% chance (95-99)
+        
+        double random = Math.random() * 100;
+        Enemy enemy;
+        
+        if (random < 50) {
+            enemy = new NormalEnemy(spawnLocation);
+        } else if (random < 75) {
+            enemy = new ZigZagEnemy(spawnLocation);
+        } else {
+            enemy = new SpikeEnemy(spawnLocation);
+        }
+        // } else {
+        //     enemy = new BossEnemy(spawnLocation);
+        //     // NOTE:: BossEnemy is currently disabled to prevent a bug thats going to be fixed in the future.
+        // }
+        
+        addEntity(enemy);
+    }
+
+    /**
+     * Get a random position along the edges of the screen.
+     * 
+     * @return a coordinate at a random edge position
+     */
+    private Coordinate2D getRandomEdgePosition() {
+        double screenWidth = getWidth();
+        double screenHeight = getHeight();
+        
+        // Choose random edge: 0=top, 1=right, 2=bottom, 3=left
+        int edge = (int) (Math.random() * 4);
+        
+        switch (edge) {
+            case 0: // Top
+                return new Coordinate2D(Math.random() * screenWidth, 0);
+            case 1: // Right
+                return new Coordinate2D(screenWidth, Math.random() * screenHeight);
+            case 2: // Bottom
+                return new Coordinate2D(Math.random() * screenWidth, screenHeight);
+            default: // Left
+                return new Coordinate2D(0, Math.random() * screenHeight);
+        }
     }
 
     /**
