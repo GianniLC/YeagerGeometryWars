@@ -437,13 +437,12 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
             enemy = new NormalEnemy(spawnLocation);
         } else if (random < 75) {
             enemy = new ZigZagEnemy(spawnLocation);
-        } else {
+        } else if (random < 95){
             enemy = new SpikeEnemy(spawnLocation);
         }
-        // } else {
-        //     enemy = new BossEnemy(spawnLocation);
-        //     // NOTE:: BossEnemy is currently disabled to prevent a bug thats going to be fixed in the future.
-        // }
+        else {
+             enemy = new BossEnemy(spawnLocation);
+         }
         
         addEntity(enemy);
     }
