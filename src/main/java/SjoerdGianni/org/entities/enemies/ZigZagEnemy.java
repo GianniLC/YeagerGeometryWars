@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 public class ZigZagEnemy extends Enemy{
 
     private boolean positiveDeviationAngle;
-    private double deviationAngleInDegrees;
+    private final double deviationAngleInDegrees;
 
     private double movementAngle;
 
@@ -18,7 +18,7 @@ public class ZigZagEnemy extends Enemy{
     private final int zigZagIntervalInMs;
 
     public ZigZagEnemy(Coordinate2D initialLocation) {
-        super(initialLocation, 15, Color.YELLOW, 15, 2);
+        super(initialLocation, 15, Color.YELLOW, 15, 1.5);
 
         deviationAngleInDegrees = 25;
 

@@ -52,6 +52,13 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
     }
 
     /**
+     * Clears all enemy object from the list of all active enemies. Necessary for when a game is finished.
+     */
+    public static void clearAllEnemies(){
+        allEnemies.clear();
+    }
+
+    /**
      * Update loop which triggers each frame
      */
     @Override
@@ -126,12 +133,14 @@ public abstract class Enemy extends DynamicRectangleEntity implements Collider, 
         if (dropChance < min || dropChance > max) {
             System.out.println("Drop chance of powerup '" + powerupClass.getSimpleName() + "' must be between " + min
                     + " and " + max + ". Current value: " + dropChance);
+            return;
         }
 
         double chance = Math.random() * 100;
         if (chance <= dropChance) {
             try {
-                GameScene.spawnPowerup(powerupClass.getConstructor(Coordinate2D.class).newInstance(getAnchorLocation()));
+                Powerup powerup = powerupClass.getConstructor(Coordinate2D.class).newInstance(getAnchorLocation());
+                GameScene.spawnPowerup(powerup);
             } catch (Exception err) {
                 System.err.println("Failed to initialize powerup: " + err.getMessage());
             }

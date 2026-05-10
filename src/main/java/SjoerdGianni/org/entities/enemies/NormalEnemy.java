@@ -6,12 +6,12 @@ import javafx.scene.paint.Color;
 
 public class NormalEnemy extends Enemy{
     public NormalEnemy(Coordinate2D initialLocation){
-        super(initialLocation, 15, Color.RED, 15, 1.5);
+        super(initialLocation, 15, Color.RED, 15, 1);
     }
 
     @Override
     public void onDeath() {
-        dropPowerup(SlowdownPowerup.class, 100);
+        dropPowerup(SlowdownPowerup.class, 15);
         super.onDeath();
     }
 

@@ -45,8 +45,8 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
     // Invulnerability tracking
     private boolean isInvulnerable = false;
     private long invulnerabilityEndTime = 0;
-    private static final int INVULNERABILITY_DURATION_MS = 1000; // 1 second
-    private static final int FLICKER_INTERVAL_MS = 100; // Flicker every 100ms
+    private static final int INVULNERABILITY_DURATION_MS = 1500;
+    private static final int FLICKER_INTERVAL_MS = 150;
 
     public Player(Coordinate2D initialLocation) {
         super(initialLocation);
@@ -56,7 +56,7 @@ public class Player extends DynamicCircleEntity implements KeyListener, Collided
         setStrokeWidth(2);
         setAnchorPoint(AnchorPoint.CENTER_CENTER);
 
-        movementSpeed = new Stat<>(3.0);
+        movementSpeed = new Stat<>(2.5);
         attackSpeedInMs = new Stat<>(225);
         attackDamage = new Stat<>(10);
         bulletMovementSpeed = new Stat<>(10.0);

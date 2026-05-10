@@ -2,6 +2,7 @@ package SjoerdGianni.org.entities.enemies;
 
 import SjoerdGianni.org.entities.player.Player;
 import SjoerdGianni.org.entities.powerups.LifePowerup;
+import SjoerdGianni.org.scenes.GameScene;
 import SjoerdGianni.org.shared.MathHelper;
 import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.entities.SceneBorderTouchingWatcher;
@@ -9,12 +10,15 @@ import com.github.hanyaeger.api.scenes.SceneBorder;
 import javafx.scene.paint.Color;
 
 public class BossEnemy extends Enemy implements SceneBorderTouchingWatcher {
-    double movementAngle;
+    private double movementAngle;
 
-    long lastBoundryTouchTimestamp;
+    private final long spawnTimestamp;
+    private long lastBoundaryTouchTimestamp;
 
     public BossEnemy(Coordinate2D initialLocation) {
-        super(initialLocation, 50, Color.SADDLEBROWN, 350, 1.5);
+        super(initialLocation, 50, Color.SADDLEBROWN, 200, 1);
+
+        spawnTimestamp = GameScene.getTimestamp();
     }
 
     @Override
@@ -27,7 +31,16 @@ public class BossEnemy extends Enemy implements SceneBorderTouchingWatcher {
 
     @Override
     public void notifyBoundaryTouching(SceneBorder border) {
-        // Logic below for bounce angle was generated with AI
+        // Fix for a bug where the BossEnemy would stay stuck inside the border, because it spawns half inside a border.
+        // Ideally, I'd want the exact frame timings of Yaeger to compare against the last boundary touch timestamp,
+        // but this solution works perfectly for now.
+        long currentTimestamp = GameScene.getTimestamp();
+        if (currentTimestamp - spawnTimestamp <= 250 || currentTimestamp - lastBoundaryTouchTimestamp <= 50){
+            lastBoundaryTouchTimestamp = currentTimestamp;
+            return;
+        }
+
+        // Switch statement and movementAngle code was generated with AI
         switch (border) {
             case TOP:
             case BOTTOM:

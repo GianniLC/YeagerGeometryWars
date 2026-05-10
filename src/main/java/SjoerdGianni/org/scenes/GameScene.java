@@ -30,8 +30,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
     private Player player;
     private static final ArrayList<Bullet> bulletsToSpawn = new ArrayList<Bullet>();
     private static final ArrayList<Powerup> powerupsToSpawn = new ArrayList<Powerup>();
-    private boolean isGameOver = false;
-    
+
     private static int score = 0;
     private static TextEntity scoreValueText;
     
@@ -67,7 +66,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
     private TextEntity slowdownPercent;
 
     // Health UI elements
-    private TextEntity[] hearts = new TextEntity[3];
+    private final TextEntity[] hearts = new TextEntity[3];
     private TextEntity overflowLivesCounter;
 
     public GameScene(YaegerGame yaegerGame) {
@@ -363,9 +362,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
         addEntitySpawner(new EntitySpawner(50) {
             @Override
             protected void spawnEntities() {
-                if (!isGameOver) {
                     processBulletSpawns();
-                }
             }
         });
 
@@ -373,7 +370,6 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
         addEntitySpawner(new EntitySpawner(100) {
             @Override
             protected void spawnEntities() {
-                if (!isGameOver) {
                     long currentTime = getTimestamp();
                     if (currentTime - lastEnemySpawnTime >= enemySpawnInterval) {
                         // Spawn 1-5 enemies at once
@@ -387,7 +383,6 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
                         // Randomize next spawn interval within difficulty range
                         enemySpawnInterval = getSpawnIntervalForDifficulty();
                     }
-                }
             }
         });
 
@@ -395,9 +390,7 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
         addEntitySpawner(new EntitySpawner(50) {
             @Override
             protected void spawnEntities() {
-                if (!isGameOver) {
                     processPowerupSpawns();
-                }
             }
         });
 
@@ -485,13 +478,15 @@ public class GameScene extends DynamicScene implements EntitySpawnerContainer, M
      */
     @Override
     public void explicitUpdate(long timestamp) {
-           if (player == null){
-                    return;
-           }
-           if (!player.isAlive()) {
-                   gameEndTime = getTimestamp();
-                  yaegerGame.setActiveScene(2);
-           }
+        if (player == null){
+                return;
+        }
+
+        if (!player.isAlive()) {
+           gameEndTime = getTimestamp();
+           Enemy.clearAllEnemies();
+           yaegerGame.setActiveScene(2);
+        }
 
         // Update powerup UI and health display
         updatePowerupUI();

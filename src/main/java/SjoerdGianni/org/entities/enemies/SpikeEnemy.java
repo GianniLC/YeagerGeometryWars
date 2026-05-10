@@ -27,7 +27,7 @@ public class SpikeEnemy extends Enemy {
 
         for (int i = 0; i < numberOfBullets; i++){
             double bulletAngle = currentRotation + (i * 360.0 / numberOfBullets);
-            GameScene.spawnBullet(new Bullet(enemyPosition, bulletAngle, 10, Player.class, 5));
+            GameScene.spawnBullet(new Bullet(enemyPosition, bulletAngle, 10, Player.class, 2));
         }
 
     }
@@ -41,7 +41,7 @@ public class SpikeEnemy extends Enemy {
     @Override
     public void onDeath(){
         fireBulletPattern();
-        dropPowerup(BulletPowerup.class, 100);
+        dropPowerup(BulletPowerup.class, 25);
         super.onDeath();
     }
 
